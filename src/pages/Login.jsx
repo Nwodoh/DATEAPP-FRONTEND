@@ -1,53 +1,177 @@
 import { useEffect, useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import Button from "../components/Button";
+import PageNav from "../components/PageNav";
+import { useAuth } from "../contexts/AuthContext";
 import styles from "./Login.module.css";
-import PageNav from "../../starter/components/PageNav";
-import { useAuth } from "../contexts/FakeAuthContext";
-import { useNavigate } from "react-router-dom";
 
-export default function Login() {
-  // PRE-FILL FOR DEV PURPOSES
+export default function Login({ type = "login" }) {
   const navigate = useNavigate();
-  const { isAuthenticated, login } = useAuth();
-  const [email, setEmail] = useState("jack@example.com");
-  const [password, setPassword] = useState("qwerty");
+  const { isAuthenticated } = useAuth();
 
-  function handleLogin(e) {
-    e.preventDefault();
-    login(email, password);
-  }
-
-  useEffect(() => {
-    if (isAuthenticated) navigate("/app");
-  }, [isAuthenticated]);
+  useEffect(
+    function () {
+      if (isAuthenticated) navigate("/app", { replace: true });
+    },
+    [isAuthenticated, navigate]
+  );
 
   return (
     <main className={styles.login}>
       <PageNav />
-      <form onSubmit={handleLogin} className={styles.form}>
-        <div className={styles.row}>
-          <label htmlFor="email">Email address</label>
-          <input
-            type="email"
-            id="email"
-            onChange={(e) => setEmail(e.target.value)}
-            value={email}
-          />
-        </div>
-
-        <div className={styles.row}>
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            onChange={(e) => setPassword(e.target.value)}
-            value={password}
-          />
-        </div>
-
-        <div>
-          <button>Login</button>
-        </div>
-      </form>
+      {type === "login" && <LoginForm />}
+      {type === "forgot-password" && <ForgotPassword />}
+      {type === "reset-password" && <ResetPassword />}
     </main>
+  );
+}
+
+function LoginForm() {
+  // PRE-FILL FOR DEV PURPOSES
+  const [email, setEmail] = useState("mickdaniels101@gmail.com");
+  const [password, setPassword] = useState("1234567");
+  const { login } = useAuth();
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    if (email && password) login(email, password);
+  }
+
+  return (
+    <form className={styles.form} onSubmit={handleSubmit}>
+      <div className={styles.row}>
+        <label htmlFor="email">Email address</label>
+        <input
+          type="email"
+          id="email"
+          onChange={(e) => setEmail(e.target.value)}
+          value={email}
+          required
+        />
+      </div>
+
+      <div className={styles.row}>
+        <label htmlFor="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          onChange={(e) => setPassword(e.target.value)}
+          value={password}
+          required
+        />
+        <Link to="/forgot-password" className={styles.forgotPassLink}>
+          forgot your password?
+        </Link>
+      </div>
+      <div>
+        <Button type="primary">Login</Button>
+      </div>
+    </form>
+  );
+}
+
+function ForgotPassword() {
+  // PRE-FILL FOR DEV PURPOSES
+  const [email, setEmail] = useState("mickdaniels101@gmail.com");
+  const { sendOtp } = useAuth();
+  const navigate = useNavigate();
+
+  async function handleSubmit(e) {
+    try {
+      e.preventDefault();
+      if (!email) return;
+      await sendOtp(email, "reset_password");
+      navigate("./reset-password");
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
+  return (
+    <form className={styles.form} onSubmit={handleSubmit}>
+      <div className={styles.row}>
+        <label htmlFor="email">Email address</label>
+        <input
+          type="email"
+          id="email"
+          onChange={(e) => setEmail(e.target.value)}
+          value={email}
+          required
+        />
+        <Link to="/reset-password" className={styles.forgotPassLink}>
+          Already have an otp? continue
+        </Link>
+      </div>
+      <div>
+        <Button type="primary">Get OTP</Button>
+      </div>
+    </form>
+  );
+}
+
+function ResetPassword() {
+  // PRE-FILL FOR DEV PURPOSES
+  const [otp, setOtp] = useState("001201");
+  const [password, setPassword] = useState("qwerty");
+  const [passwordConfirm, setPasswordConfirm] = useState("qwerty");
+  const { user, resetPassword } = useAuth();
+  const email = user?.email;
+  console.log(email);
+
+  async function handleSubmit(e) {
+    try {
+      e.preventDefault();
+      if (!email)
+        throw new Error(
+          "Your email was not found, Please regenerate a new token or try loggin in again."
+        );
+      await resetPassword({ email, password, passwordConfirm, otp });
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
+  return (
+    <form className={styles.form} onSubmit={handleSubmit}>
+      <div className={styles.row}>
+        <label htmlFor="otp">6 digit OTP sent to {email}</label>
+        <input
+          type="text"
+          id="otp"
+          maxLength={6}
+          value={otp}
+          onChange={(e) => setOtp(e.target.value)}
+          required
+        />
+      </div>
+      <div className={styles.row}>
+        <label htmlFor="password">New Password</label>
+        <input
+          type="password"
+          id="password"
+          minLength={5}
+          onChange={(e) => setPassword(e.target.value)}
+          value={password}
+          required
+        />
+      </div>
+      <div className={styles.row}>
+        <label htmlFor="passwordConfirm">Confirm Password</label>
+        <input
+          type="password"
+          id="passwordConfirm"
+          minLength={5}
+          onChange={(e) => setPasswordConfirm(e.target.value)}
+          value={passwordConfirm}
+          required
+        />
+        <Link to="/forgot-password" className={styles.forgotPassLink}>
+          No otp? Generate One
+        </Link>
+      </div>
+      <div>
+        <Button type="primary">Reset Password</Button>
+      </div>
+    </form>
   );
 }

@@ -1,34 +1,32 @@
-import CountryItem from "./CountryItem";
-import Message from "./Message";
 import Spinner from "./Spinner";
 import styles from "./CountryList.module.css";
-import PropTypes from "prop-types";
-import { useCity } from "../contexts/CityContext";
+import CountryItem from "./CountryItem";
+import Message from "./Message";
+import { useChats } from "../contexts/ChatsContext";
 
 function CountryList() {
-  const { cities, isLoading } = useCity();
-  const countries = cities.reduce((acc, curr) => {
-    const { country, emoji } = curr;
-    if (acc.some((item) => item?.country === country)) return acc;
-    else acc.push({ country, emoji });
-    return acc;
-  }, []);
+  const { cities, isLoading } = useChats();
 
   if (isLoading) return <Spinner />;
+
   if (!cities.length)
-    return <Message message="Add your first City By Clicking on the Map." />;
+    return (
+      <Message message="Add your first city by clicking on a city on the map" />
+    );
+
+  const countries = cities.reduce((arr, city) => {
+    if (!arr.map((el) => el.country).includes(city.country))
+      return [...arr, { country: city.country, emoji: city.emoji }];
+    else return arr;
+  }, []);
+
   return (
     <ul className={styles.countryList}>
-      {countries?.map((country, i) => (
-        <CountryItem country={country} key={i} />
+      {countries.map((country) => (
+        <CountryItem country={country} key={country.country} />
       ))}
     </ul>
   );
 }
-
-CountryList.propTypes = {
-  cities: PropTypes.array,
-  isLoading: PropTypes.bool,
-};
 
 export default CountryList;

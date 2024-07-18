@@ -1,8 +1,8 @@
 .login {
-  margin: 2.5rem;
+  margin: 2rem;
+  height: calc(100svh - 4rem);
   padding: 2.5rem 5rem;
   background-color: var(--color-dark--1);
-  min-height: calc(100vh - 5rem);
 }
 
 .form {
@@ -23,4 +23,9 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+}
+
+.forgotPassLink {
+  font-size: 1.2rem;
+  color: var(--color-light--1);
 }

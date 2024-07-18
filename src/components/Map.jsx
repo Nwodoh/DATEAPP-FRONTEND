@@ -1,6 +1,4 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
-import PropTypes from "prop-types";
-
 import {
   MapContainer,
   TileLayer,
@@ -9,21 +7,22 @@ import {
   useMap,
   useMapEvents,
 } from "react-leaflet";
+
 import styles from "./Map.module.css";
 import { useEffect, useState } from "react";
-import { useCity } from "../contexts/CityContext";
+import { useChats } from "../contexts/ChatsContext";
+import { useGeolocation } from "../hooks/useGeolocation";
+import { useUrlPosition } from "../hooks/useUrlPosition";
 import Button from "./Button";
-import { useGeoLocation } from "../hooks/useGeoLocation";
-import useUrlPosition from "../hooks/useUrlPosition";
 
 function Map() {
-  const { cities } = useCity();
+  const { chats } = useChats();
+  const [mapPosition, setMapPosition] = useState([40, 0]);
   const {
     isLoading: isLoadingPosition,
-    position: geoLocationPosition,
+    position: geolocationPosition,
     getPosition,
-  } = useGeoLocation();
-  const [mapPosition, setMapPosition] = useState([40, 0]);
+  } = useGeolocation();
   const [mapLat, mapLng] = useUrlPosition();
 
   useEffect(
@@ -33,32 +32,25 @@ function Map() {
     [mapLat, mapLng]
   );
 
-  useEffect(
-    function () {
-      const { lat, lng } = geoLocationPosition;
-      if (typeof lat === "number" && typeof lng === "number") {
-        setMapPosition([lat, lng]);
-      }
-    },
-    [geoLocationPosition]
-  );
-
-  function handleGetPosition() {
-    getPosition();
-  }
+  // useEffect(
+  //   function () {
+  //     if (geolocationPosition)
+  //       setMapPosition([geolocationPosition.lat, geolocationPosition.lng]);
+  //   },
+  //   [geolocationPosition]
+  // );
 
   return (
     <div className={styles.mapContainer}>
-      {typeof geoLocationPosition?.lat !== "number" ? (
-        <Button type="position" onClick={() => handleGetPosition()}>
-          {isLoadingPosition ? "Loading..." : "Use Your Location."}
+      {!geolocationPosition && (
+        <Button type="position" onClick={getPosition}>
+          {isLoadingPosition ? "Loading..." : "Use your position"}
         </Button>
-      ) : (
-        ""
       )}
+
       <MapContainer
         center={mapPosition}
-        zoom={4}
+        zoom={6}
         scrollWheelZoom={true}
         className={styles.map}
       >
@@ -66,29 +58,25 @@ function Map() {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
         />
-        {cities.map((city, i) => {
-          const {
-            cityName: name,
-            emoji,
-            position: { lat, lng },
-          } = city;
-          return (
-            <Marker position={[lat, lng]} key={i}>
-              <Popup>
-                <span>{emoji}</span>
-                <span>{name}</span>
-              </Popup>
-              <ChangMapView position={mapPosition} />
-              <DetectClick />
-            </Marker>
-          );
-        })}
+        {/* {chats.map((city) => (
+          <Marker
+            position={[city.position.lat, city.position.lng]}
+            key={city.id}
+          >
+            <Popup>
+              <span>{city.emoji}</span> <span>{city.cityName}</span>
+            </Popup>
+          </Marker>
+        ))} */}
+
+        <ChangeCenter position={mapPosition} />
+        <DetectClick />
       </MapContainer>
     </div>
   );
 }
 
-function ChangMapView({ position }) {
+function ChangeCenter({ position }) {
   const map = useMap();
   map.setView(position);
   return null;
@@ -96,18 +84,10 @@ function ChangMapView({ position }) {
 
 function DetectClick() {
   const navigate = useNavigate();
+
   useMapEvents({
-    click: (e) => {
-      const {
-        latlng: { lat, lng },
-      } = e;
-      navigate(`form?lat=${lat}&lng=${lng}`);
-    },
+    click: (e) => navigate(`form?lat=${e.latlng.lat}&lng=${e.latlng.lng}`),
   });
 }
-
-ChangMapView.propTypes = {
-  position: PropTypes.array,
-};
 
 export default Map;

@@ -1,9 +1,9 @@
-import { useParams } from "react-router-dom";
-import styles from "./City.module.css";
 import { useEffect } from "react";
-import { useCity } from "../contexts/CityContext";
-import Spinner from "./Spinner";
+import { useParams } from "react-router-dom";
+import { useChats } from "../contexts/ChatsContext";
 import BackButton from "./BackButton";
+import styles from "./City.module.css";
+import Spinner from "./Spinner";
 
 const formatDate = (date) =>
   new Intl.DateTimeFormat("en", {
@@ -14,22 +14,24 @@ const formatDate = (date) =>
   }).format(new Date(date));
 
 function City() {
-  const { currentCity, getCity, isLoading } = useCity();
   const { id } = useParams();
-  // TEMP DATA
+  const { getCity, currentCity, isLoading } = useChats();
 
-  useEffect(() => {
-    getCity(id);
-  }, [id]);
+  useEffect(
+    function () {
+      getCity(id);
+    },
+    [id, getCity]
+  );
 
   const { cityName, emoji, date, notes } = currentCity;
 
-  return isLoading ? (
-    <Spinner />
-  ) : (
+  if (isLoading) return <Spinner />;
+
+  return (
     <div className={styles.city}>
       <div className={styles.row}>
-        <h6>City name: {id}</h6>
+        <h6>City name</h6>
         <h3>
           <span>{emoji}</span> {cityName}
         </h3>

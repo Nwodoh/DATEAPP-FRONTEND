@@ -3,8 +3,13 @@ import styles from "./Logo.module.css";
 
 function Logo() {
   return (
-    <Link to="/">
-      <img src="/logo.png" alt="WorldWise logo" className={styles.logo} />
+    <Link to="/" className={styles.logo}>
+      <img
+        src="/fav-icon.png"
+        alt="WorldWise logo"
+        className={styles.logoImg}
+      />
+      <p className={styles.logoText}>DateMap</p>
     </Link>
   );
 }
