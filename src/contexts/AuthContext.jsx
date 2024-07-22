@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useReducer } from "react";
 import { useNavigate } from "react-router-dom";
+import { socket } from "../socket";
 
 const AuthContext = createContext();
 const BASE_API = "http://127.0.0.1:5000/api/v1";
@@ -9,28 +10,38 @@ const USER_API = `${BASE_API}/user`;
 const initialState = {
   user: null,
   isAuthenticated: true,
+  isLoading: false,
 };
 
 function reducer(state, action) {
   switch (action.type) {
+    case "loading":
+      return { ...state, isLoading: true };
+    case "loaded":
+      return { ...state, isLoading: false };
     case "login":
-      return { ...state, user: action.payload, isAuthenticated: true };
+      socket.emit("online", action.payload);
+      return {
+        ...state,
+        isLoading: false,
+        user: action.payload,
+        isAuthenticated: true,
+      };
     case "logout":
-      return { ...state, user: null, isAuthenticated: false };
+      return { ...state, isLoading: false, user: null, isAuthenticated: false };
     case "update/user":
       const user = state.user || {};
       const update = action.payload.reduce((acc, update) => {
         acc[update[0]] = update[1];
         return acc;
       }, {});
-      return { ...state, user: { ...user, ...update } };
+      return { ...state, isLoading: false, user: { ...user, ...update } };
     default:
       throw new Error("Unknown action");
   }
 }
 
 function AuthProvider({ children }) {
-  const navigate = useNavigate();
   const [{ user, isAuthenticated }, dispatch] = useReducer(
     reducer,
     initialState
@@ -38,16 +49,16 @@ function AuthProvider({ children }) {
 
   useEffect(() => {
     async function getUser() {
+      dispatch({ type: "loading" });
+
       try {
         const res = await fetch(`${USER_API}/me`, { credentials: "include" });
         const data = await res.json();
-        console.log(data);
         if (data.status !== "success") throw new Error();
         if (!data.user) throw new Error();
         dispatch({ type: "login", payload: data.user });
       } catch {
         dispatch({ type: "logout" });
-        navigate("/login");
       }
     }
 
@@ -55,6 +66,8 @@ function AuthProvider({ children }) {
   }, []);
 
   async function login(email, password) {
+    dispatch({ type: "loading" });
+
     try {
       const res = await fetch(`${AUTH_API}/login`, {
         method: "POST",
@@ -70,13 +83,17 @@ function AuthProvider({ children }) {
       if (!data.user) throw new Error("User not Found.");
 
       dispatch({ type: "login", payload: data.user });
-      console.log(data.user);
     } catch (err) {
+      dispatch({ type: "loaded" });
+      dispatch({ type: "loading" });
+
       alert(err.message || "There was an error with your request");
     }
   }
 
   async function sendOtp(email, type = "signup") {
+    dispatch({ type: "loading" });
+
     try {
       if (!email) return;
       if (!type) throw new Error("OTP type not set @ sendOTP");
@@ -94,14 +111,16 @@ function AuthProvider({ children }) {
 
       dispatch({ type: "update/user", payload: [["email", email]] });
     } catch (err) {
+      dispatch({ type: "loaded" });
       throw new Error(err.message);
     }
   }
 
   async function resetPassword(userData) {
+    dispatch({ type: "loading" });
+
     try {
       if (!userData?.email) return;
-      console.log(userData);
       const res = await fetch(`${AUTH_API}/reset-password`, {
         method: "POST",
         headers: {
@@ -116,30 +135,35 @@ function AuthProvider({ children }) {
 
       dispatch({ type: "login", payload: data.user });
     } catch (err) {
+      dispatch({ type: "loaded" });
       alert(err.message);
     }
   }
 
   async function signup(userData) {
-    if (!userData?.email) return;
-    console.log(userData);
-    const res = await fetch(`${AUTH_API}/signup`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(userData),
-      credentials: "include",
-    });
+    try {
+      if (!userData?.email) return;
+      const res = await fetch(`${AUTH_API}/signup`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+        credentials: "include",
+      });
 
-    const data = await res.json();
-    if (data.status !== "success") throw new Error(data.message);
+      const data = await res.json();
+      if (data.status !== "success") throw new Error(data.message);
 
-    dispatch({ type: "login", payload: data.user });
+      dispatch({ type: "login", payload: data.user });
+    } catch {
+      dispatch({ type: "loaded" });
+      alert("Error with signing up");
+    }
   }
 
   async function logout() {
-    await fetch(`${AUTH_API}/logout`);
+    await fetch(`${AUTH_API}/logout`, { credentials: "include" });
     dispatch({ type: "logout" });
   }
 

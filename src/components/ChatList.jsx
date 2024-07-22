@@ -15,7 +15,7 @@ function ChatList() {
   return (
     <ul className={styles.chatList}>
       {chats.map((chat) => (
-        <ChatListItem chat={chat} key={chat.id} />
+        <ChatListItem chat={chat} key={chat.other_user.id} />
       ))}
     </ul>
   );

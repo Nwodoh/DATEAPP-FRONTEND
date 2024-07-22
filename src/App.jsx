@@ -7,9 +7,9 @@ import ProtectedRoute from "./pages/ProtectedRoute";
 
 import ChatList from "./components/ChatList";
 import CountryList from "./components/CountryList";
-import City from "./components/City";
 import Form from "./components/Form";
 import SpinnerFullPage from "./components/SpinnerFullPage";
+import ChatPage from "./components/ChatPage";
 
 const Homepage = lazy(() => import("./pages/Homepage"));
 const About = lazy(() => import("./pages/About"));
@@ -48,7 +48,7 @@ function App() {
               >
                 <Route index element={<Navigate replace to="chats" />} />
                 <Route path="chats" element={<ChatList />} />
-                <Route path="chats/:id" element={<City />} />
+                <Route path="chats/:id" element={<ChatPage />} />
                 <Route path="countries" element={<CountryList />} />
                 <Route path="form" element={<Form />} />
               </Route>

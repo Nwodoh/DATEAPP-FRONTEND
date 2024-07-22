@@ -6,16 +6,15 @@ import {
   useCallback,
 } from "react";
 import { useAuth } from "./AuthContext";
-
-const BASE_URL = "http://localhost:9000";
-const BASE_URL_2 = "http://127.0.0.1:5000/api/v1/chat";
+import { socket } from "../socket";
 
 const ChatsContext = createContext();
 
 const initialState = {
   chats: [],
   isLoading: false,
-  currentChat: {},
+  activeChat: 0,
+  currentChat: [],
   error: "",
 };
 
@@ -25,6 +24,7 @@ function reducer(state, action) {
       return { ...state, isLoading: true };
 
     case "chats/loaded":
+      socket.emit("chat/active", action.payload || []);
       return {
         ...state,
         isLoading: false,
@@ -32,16 +32,25 @@ function reducer(state, action) {
       };
 
     case "chat/loaded":
-      return { ...state, isLoading: false, currentChat: action.payload || [] };
-
-    case "chat/created":
       return {
         ...state,
         isLoading: false,
-        chats: [...state.chats, action.payload],
-        currentCity: action.payload,
+        currentChat: action.payload.currentChat || [],
+        activeChat: +action.payload.activeChat || 0,
       };
 
+    case "chat/new":
+      return {
+        ...state,
+        chats: state.chats.map((chat) => {
+          if (chat.other_user.id !== action.payload.other_user.id) return chat;
+          else return action.payload;
+        }),
+        currentChat: [...state.currentChat, action.payload],
+      };
+
+    case "clear":
+      return initialState;
     case "rejected":
       return {
         ...state,
@@ -55,11 +64,10 @@ function reducer(state, action) {
 }
 
 function ChatsProvider({ children }) {
-  const { user } = useAuth();
-  const [{ chats, isLoading, currentChat, error }, dispatch] = useReducer(
-    reducer,
-    initialState
-  );
+  const { BASE_API, isAuthenticated, user } = useAuth();
+  const CHAT_API = `${BASE_API}/chat`;
+  const [{ chats, isLoading, currentChat, activeChat, error }, dispatch] =
+    useReducer(reducer, initialState);
 
   useEffect(
     function () {
@@ -67,13 +75,12 @@ function ChatsProvider({ children }) {
         dispatch({ type: "loading" });
 
         try {
-          const res = await fetch(BASE_URL_2, {
+          const res = await fetch(CHAT_API, {
             credentials: "include",
           });
           const data = await res.json();
           dispatch({ type: "chats/loaded", payload: data.chats });
         } catch (err) {
-          console.log(err, 2);
           dispatch({
             type: "rejected",
             payload: "There was an error loading your chats...",
@@ -82,67 +89,76 @@ function ChatsProvider({ children }) {
       }
       getChats();
     },
-    [user]
+    [CHAT_API, isAuthenticated]
   );
 
-  const getChat = useCallback(
-    async function getChat(otherUserId) {
-      if (Number(otherUserId) === currentChat.id) return;
+  const getChat = useCallback(async function getChat(chatId, otherUserId) {
+    if (Number(chatId) === currentChat.id) return;
 
-      dispatch({ type: "loading" });
-
-      try {
-        const res = await fetch(`${BASE_URL_2}/${otherUserId}`);
-        const data = await res.json();
-        dispatch({ type: "chat/loaded", payload: data });
-      } catch {
-        dispatch({
-          type: "rejected",
-          payload: "There was an error loading this chat...",
-        });
-      }
-    },
-    [currentChat.id]
-  );
-
-  async function createCity(newCity) {
     dispatch({ type: "loading" });
 
     try {
-      const res = await fetch(`${BASE_URL}/cities`, {
-        method: "POST",
-        body: JSON.stringify(newCity),
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const res = await fetch(`${CHAT_API}/${otherUserId}`, {
+        credentials: "include",
       });
       const data = await res.json();
 
-      dispatch({ type: "city/created", payload: data });
-    } catch {
+      if (data.status !== "success") throw new Error();
+
+      dispatch({
+        type: "chat/loaded",
+        payload: { currentChat: data.chats, activeChat: otherUserId },
+      });
+    } catch (err) {
       dispatch({
         type: "rejected",
-        payload: "There was an error creating the city...",
+        payload: "There was an error loading this chat...",
       });
+    }
+  }, []);
+
+  async function sendChat(receiverId, message) {
+    try {
+      const res = await fetch(`${CHAT_API}/`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ receiverId, message }),
+      });
+
+      const data = await res.json();
+      if (data.status !== "success") throw new Error();
+      dispatch({
+        type: "chat/new",
+        payload: data.newChat,
+      });
+      socket.emit("chat/sent", data.newChat);
+    } catch {
+      alert("Error Sending Message, Please check your internet connection.");
     }
   }
 
-  // async function deleteCity(id) {
-  //   dispatch({ type: "loading" });
+  function clearChatState() {
+    dispatch({ type: "clear" });
+  }
 
-  //   try {
-  //     await fetch(`${BASE_URL}/cities/${id}`, {
-  //       method: "DELETE",
-  //     });
+  useEffect(() => {
+    function handleChatReceived(newChat) {
+      if (newChat?.sender?.id === user?.id) return;
+      dispatch({
+        type: "chat/new",
+        payload: newChat,
+      });
+    }
 
-  //     dispatch({ type: "city/deleted", payload: id });
-  //   } catch {
-  //     dispatch({
-  //       type: "rejected",
-  //       payload: "There was an error deleting the city...",
-  //     });
-  //   }
-  // }
+    socket.on("chat/received", handleChatReceived);
+
+    return () => {
+      socket.off("chat/received", handleChatReceived);
+    };
+  }, []);
 
   return (
     <ChatsContext.Provider
@@ -152,8 +168,9 @@ function ChatsProvider({ children }) {
         currentChat,
         error,
         getChat,
-        createCity,
-        // deleteCity,
+        activeChat,
+        sendChat,
+        clearChatState,
       }}
     >
       {children}
@@ -169,17 +186,3 @@ function useChats() {
 }
 
 export { ChatsProvider, useChats };
-// case "city/deleted":
-//       return {
-//         ...state,
-//         isLoading: false,
-//         cities: state.cities.filter((city) => city.id !== action.payload),
-//         currentCity: {},
-//       };
-
-// case "rejected":
-//   return {
-//     ...state,
-//     isLoading: false,
-//     error: action.payload,
-//   };
