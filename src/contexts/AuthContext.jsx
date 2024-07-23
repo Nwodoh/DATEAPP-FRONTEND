@@ -1,5 +1,10 @@
-import { createContext, useContext, useEffect, useReducer } from "react";
-import { useNavigate } from "react-router-dom";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useReducer,
+} from "react";
 import { socket } from "../socket";
 
 const AuthContext = createContext();
@@ -11,6 +16,7 @@ const initialState = {
   user: null,
   isAuthenticated: true,
   isLoading: false,
+  allUsers: [],
 };
 
 function reducer(state, action) {
@@ -29,39 +35,44 @@ function reducer(state, action) {
       };
     case "logout":
       return { ...state, isLoading: false, user: null, isAuthenticated: false };
-    case "update/user":
+    case "user/update":
       const user = state.user || {};
       const update = action.payload.reduce((acc, update) => {
         acc[update[0]] = update[1];
         return acc;
       }, {});
       return { ...state, isLoading: false, user: { ...user, ...update } };
+    case "user/all":
+      return { ...state, allUsers: [...state.allUsers, ...action.payload] };
     default:
       throw new Error("Unknown action");
   }
 }
 
 function AuthProvider({ children }) {
-  const [{ user, isAuthenticated }, dispatch] = useReducer(
+  const [{ user, isAuthenticated, allUsers }, dispatch] = useReducer(
     reducer,
     initialState
   );
 
-  useEffect(() => {
-    async function getUser() {
-      dispatch({ type: "loading" });
+  async function getUser(userId = "") {
+    dispatch({ type: "loading" });
 
-      try {
-        const res = await fetch(`${USER_API}/me`, { credentials: "include" });
-        const data = await res.json();
-        if (data.status !== "success") throw new Error();
-        if (!data.user) throw new Error();
-        dispatch({ type: "login", payload: data.user });
-      } catch {
-        dispatch({ type: "logout" });
-      }
+    try {
+      const res = await fetch(`${USER_API}/user/${userId}`, {
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (data.status !== "success") throw new Error();
+      if (!data.user) throw new Error();
+      dispatch({ type: "login", payload: data.user });
+      return data.user;
+    } catch {
+      dispatch({ type: "logout" });
     }
+  }
 
+  useEffect(() => {
     getUser();
   }, []);
 
@@ -109,7 +120,7 @@ function AuthProvider({ children }) {
       if (data.status !== "success") throw new Error(data.message);
       alert(`Sending 6 digit OTP ${email}. This might take some minutes.`);
 
-      dispatch({ type: "update/user", payload: [["email", email]] });
+      dispatch({ type: "user/update", payload: [["email", email]] });
     } catch (err) {
       dispatch({ type: "loaded" });
       throw new Error(err.message);
@@ -162,6 +173,30 @@ function AuthProvider({ children }) {
     }
   }
 
+  const getUsersAroundPoint = useCallback(async function getUsersAroundPoint(
+    position = []
+  ) {
+    const [lat, lon] = position;
+    if (!Number(lat) || !Number(lon)) return;
+
+    dispatch({ type: "loading" });
+
+    try {
+      const res = await fetch(`${USER_API}/?lat=${lat}&lon=${lon}`, {
+        credentials: "include",
+      });
+      const data = await res.json();
+
+      if (data.status !== "success") throw new Error();
+
+      console.log(data);
+      dispatch({ type: "user/all", payload: data.users });
+    } catch (err) {
+      console.error(err);
+    }
+  },
+  []);
+
   async function logout() {
     await fetch(`${AUTH_API}/logout`, { credentials: "include" });
     dispatch({ type: "logout" });
@@ -178,6 +213,9 @@ function AuthProvider({ children }) {
         resetPassword,
         signup,
         BASE_API,
+        getUsersAroundPoint,
+        allUsers,
+        getUser,
       }}
     >
       {children}

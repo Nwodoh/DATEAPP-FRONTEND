@@ -6,7 +6,6 @@ import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./pages/ProtectedRoute";
 
 import ChatList from "./components/ChatList";
-import CountryList from "./components/CountryList";
 import Form from "./components/Form";
 import SpinnerFullPage from "./components/SpinnerFullPage";
 import ChatPage from "./components/ChatPage";
@@ -48,8 +47,7 @@ function App() {
               >
                 <Route index element={<Navigate replace to="chats" />} />
                 <Route path="chats" element={<ChatList />} />
-                <Route path="chats/:id" element={<ChatPage />} />
-                <Route path="countries" element={<CountryList />} />
+                <Route path="chats/:otherUserId" element={<ChatPage />} />
                 <Route path="form" element={<Form />} />
               </Route>
               <Route path="*" element={<PageNotFound />} />

@@ -4,20 +4,41 @@ import styles from "./ChatPage.module.css";
 import Img from "./Img";
 import { useEffect, useState } from "react";
 import Spinner from "./Spinner";
+import { useAuth } from "../contexts/AuthContext";
 
 function ChatPage() {
+  // const otherUserFromChat = chats.find(
+  //   (chat) => chat.other_user.id === Number(otherUserId)
+  // )?.other_user;
   const [message, setMessage] = useState("");
+  const [otherUser, setOtherUser] = useState({});
+  const { otherUserId } = useParams();
+  const { getUser } = useAuth();
   const { currentChat, chats, getChat, isLoading, sendChat } = useChats();
-  const { id } = useParams();
-  const otherUser = chats.find(
-    (chat) => chat.other_user.id === Number(id)
-  )?.other_user;
+
+  async function storeOtherUser(otherUserId) {
+    const otherUser =
+      chats.find((chat) => chat.other_user.id === Number(otherUserId))
+        ?.other_user || (await getUser(otherUserId));
+    setOtherUser(otherUser);
+  }
 
   useEffect(
     function () {
-      !isLoading && getChat(id, otherUser?.id);
+      async function initOtherUser() {
+        await storeOtherUser(otherUserId);
+      }
+      initOtherUser();
     },
-    [id, getChat, chats]
+    [otherUserId]
+  );
+
+  useEffect(
+    function () {
+      if (!otherUser?.id) return;
+      !isLoading && getChat(otherUser?.id);
+    },
+    [getChat, chats, otherUser]
   );
 
   function handleSendChat(e) {
@@ -26,7 +47,7 @@ function ChatPage() {
     setMessage("");
   }
 
-  if (isLoading || !otherUser) return <Spinner />;
+  if (isLoading || !otherUser?.id) return <Spinner />;
 
   return (
     <div className={styles.chatPage}>

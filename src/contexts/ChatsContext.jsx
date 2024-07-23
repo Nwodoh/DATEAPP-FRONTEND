@@ -16,6 +16,7 @@ const initialState = {
   activeChat: 0,
   currentChat: [],
   error: "",
+  otherUser: {},
 };
 
 function reducer(state, action) {
@@ -49,6 +50,12 @@ function reducer(state, action) {
         currentChat: [...state.currentChat, action.payload],
       };
 
+    case "chat/otherUser":
+      return {
+        ...state,
+        otherUser: action.payload,
+      };
+
     case "clear":
       return initialState;
     case "rejected":
@@ -64,7 +71,7 @@ function reducer(state, action) {
 }
 
 function ChatsProvider({ children }) {
-  const { BASE_API, isAuthenticated, user } = useAuth();
+  const { BASE_API, isAuthenticated, user, otherUser, getUser } = useAuth();
   const CHAT_API = `${BASE_API}/chat`;
   const [{ chats, isLoading, currentChat, activeChat, error }, dispatch] =
     useReducer(reducer, initialState);
@@ -92,9 +99,7 @@ function ChatsProvider({ children }) {
     [CHAT_API, isAuthenticated]
   );
 
-  const getChat = useCallback(async function getChat(chatId, otherUserId) {
-    if (Number(chatId) === currentChat.id) return;
-
+  const getChat = useCallback(async function getChat(otherUserId) {
     dispatch({ type: "loading" });
 
     try {
@@ -171,6 +176,7 @@ function ChatsProvider({ children }) {
         activeChat,
         sendChat,
         clearChatState,
+        otherUser,
       }}
     >
       {children}

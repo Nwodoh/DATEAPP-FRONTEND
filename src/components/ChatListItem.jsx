@@ -12,9 +12,8 @@ const formatDate = (date) =>
   }).format(new Date(date));
 
 function ChatListItem({ chat }) {
-  const { user } = useAuth();
   const { activeChat } = useChats();
-  const { message, timestamp, id, other_user: otherUser } = chat;
+  const { message, timestamp, other_user: otherUser } = chat;
 
   return (
     <li>
