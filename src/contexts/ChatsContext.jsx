@@ -16,7 +16,6 @@ const initialState = {
   activeChat: 0,
   currentChat: [],
   error: "",
-  otherUser: {},
 };
 
 function reducer(state, action) {
@@ -50,11 +49,8 @@ function reducer(state, action) {
         currentChat: [...state.currentChat, action.payload],
       };
 
-    case "chat/otherUser":
-      return {
-        ...state,
-        otherUser: action.payload,
-      };
+    case "chat/newPerson":
+      return { ...state, chats: [...state.chats, action.payload] };
 
     case "clear":
       return initialState;
@@ -71,7 +67,7 @@ function reducer(state, action) {
 }
 
 function ChatsProvider({ children }) {
-  const { BASE_API, isAuthenticated, user, otherUser, getUser } = useAuth();
+  const { BASE_API, isAuthenticated, user } = useAuth();
   const CHAT_API = `${BASE_API}/chat`;
   const [{ chats, isLoading, currentChat, activeChat, error }, dispatch] =
     useReducer(reducer, initialState);
@@ -135,6 +131,17 @@ function ChatsProvider({ children }) {
 
       const data = await res.json();
       if (data.status !== "success") throw new Error();
+
+      if (
+        !chats.find((chat) => chat.other_user.id === data.newChat.other_user.id)
+      ) {
+        console.log("new!!!!!");
+        dispatch({
+          type: "chat/newPerson",
+          payload: data.newChat,
+        });
+      } else console.log("Old");
+
       dispatch({
         type: "chat/new",
         payload: data.newChat,
@@ -176,7 +183,6 @@ function ChatsProvider({ children }) {
         activeChat,
         sendChat,
         clearChatState,
-        otherUser,
       }}
     >
       {children}

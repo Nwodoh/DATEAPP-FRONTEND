@@ -17,6 +17,7 @@ const initialState = {
   isAuthenticated: true,
   isLoading: false,
   allUsers: [],
+  likes: [],
 };
 
 function reducer(state, action) {
@@ -43,7 +44,11 @@ function reducer(state, action) {
       }, {});
       return { ...state, isLoading: false, user: { ...user, ...update } };
     case "user/all":
-      return { ...state, allUsers: [...state.allUsers, ...action.payload] };
+      action.payload.forEach((user) => {
+        if (state.allUsers.find((el) => el.id === user.id)) return;
+        else state.allUsers.push(user);
+      });
+      return { ...state, allUsers: state.allUsers };
     default:
       throw new Error("Unknown action");
   }
@@ -189,13 +194,26 @@ function AuthProvider({ children }) {
 
       if (data.status !== "success") throw new Error();
 
-      console.log(data);
       dispatch({ type: "user/all", payload: data.users });
     } catch (err) {
       console.error(err);
     }
   },
   []);
+
+  async function like(userId, isUnlike = false) {
+    try {
+      const res = await fetch(`${USER_API}/like/${userId}`, {
+        method: isUnlike ? "DELETE" : "POST",
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (data.status !== "success") throw new Error(data.message);
+    } catch (err) {
+      console.log();
+      alert(err.message || "Unable to like user's profile");
+    }
+  }
 
   async function logout() {
     await fetch(`${AUTH_API}/logout`, { credentials: "include" });
@@ -216,6 +234,7 @@ function AuthProvider({ children }) {
         getUsersAroundPoint,
         allUsers,
         getUser,
+        like,
       }}
     >
       {children}
