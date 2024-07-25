@@ -148,6 +148,7 @@ function AuthProvider({ children }) {
       if (!type) throw new Error("OTP type not set @ sendOTP");
       const res = await fetch(`${AUTH_API}/otp/${type}`, {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -172,6 +173,7 @@ function AuthProvider({ children }) {
       if (!userData?.email) return;
       const res = await fetch(`${AUTH_API}/reset-password`, {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -194,11 +196,11 @@ function AuthProvider({ children }) {
       if (!userData?.email) return;
       const res = await fetch(`${AUTH_API}/signup`, {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(userData),
-        credentials: "include",
       });
 
       const data = await res.json();

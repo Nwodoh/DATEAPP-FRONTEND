@@ -52,6 +52,7 @@ function SignupForm() {
 
 function VerificationForm() {
   // PRE-FILL FOR DEV PURPOSES
+  const navigate = useNavigate();
   const [otp, setOtp] = useState("001201");
   const [password, setPassword] = useState("qwerty");
   const [passwordConfirm, setPasswordConfirm] = useState("qwerty");
@@ -62,6 +63,7 @@ function VerificationForm() {
     try {
       e.preventDefault();
       signup({ email, password, passwordConfirm, otp });
+      navigate("/update");
     } catch (err) {
       alert(err);
     }

@@ -81,7 +81,7 @@ function ForgotPassword() {
       e.preventDefault();
       if (!email) return;
       await sendOtp(email, "reset_password");
-      navigate("./reset-password");
+      navigate("/reset-password");
     } catch (err) {
       alert(err.message);
     }
@@ -116,7 +116,6 @@ function ResetPassword() {
   const [passwordConfirm, setPasswordConfirm] = useState("qwerty");
   const { user, resetPassword } = useAuth();
   const email = user?.email;
-  console.log(email);
 
   async function handleSubmit(e) {
     try {

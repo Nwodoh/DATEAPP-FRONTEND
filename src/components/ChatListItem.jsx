@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { useChats } from "../contexts/ChatsContext";
-import { useAuth } from "../contexts/AuthContext";
 import styles from "./ChatListItem.module.css";
 import Img from "./Img";
 
