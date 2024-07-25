@@ -104,7 +104,7 @@ function VerificationForm() {
         </Link>
       </div>
       <div>
-        <Button type="primary">Reset Password</Button>
+        <Button type="primary">Sign Up</Button>
       </div>
     </form>
   );

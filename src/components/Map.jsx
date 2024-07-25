@@ -10,7 +10,6 @@ import {
 
 import styles from "./Map.module.css";
 import { useEffect, useState } from "react";
-import { useChats } from "../contexts/ChatsContext";
 import { useGeolocation } from "../hooks/useGeolocation";
 import { useUrlPosition } from "../hooks/useUrlPosition";
 import Button from "./Button";
@@ -18,15 +17,26 @@ import Img from "./Img";
 import { useAuth } from "../contexts/AuthContext";
 
 function Map() {
-  const { allUsers, getUsersAroundPoint, BASE_API, like, user } = useAuth();
-  const [likedUsers, setLikedUsers] = useState(user?.likedUsers);
-  const [mapPosition, setMapPosition] = useState([6, 5]);
+  const {
+    allUsers,
+    getUsersAroundPoint,
+    BASE_API,
+    like,
+    user,
+    mapPosition,
+    setMapPosition,
+  } = useAuth();
+  const [likedUsers, setLikedUsers] = useState(user?.likedUsers || []);
   const {
     isLoading: isLoadingPosition,
     position: geolocationPosition,
     getPosition,
   } = useGeolocation();
   const [mapLat, mapLng] = useUrlPosition(mapPosition);
+
+  useEffect(() => {
+    user && setLikedUsers(user.likedUsers || []);
+  }, [user]);
 
   function getAge(date) {
     const year = new Date(date).getFullYear();
@@ -40,7 +50,7 @@ function Map() {
       setMapPosition([mapLat, mapLng]);
       getUsersAroundPoint([mapLat, mapLng]);
     },
-    [mapLat, mapLng]
+    [mapLat, mapLng, getUsersAroundPoint, setMapPosition]
   );
 
   useEffect(
@@ -48,7 +58,7 @@ function Map() {
       if (geolocationPosition)
         setMapPosition([geolocationPosition.lat, geolocationPosition.lng]);
     },
-    [geolocationPosition]
+    [geolocationPosition, setMapPosition]
   );
 
   async function handleLike(userId) {
@@ -76,7 +86,7 @@ function Map() {
 
       <MapContainer
         center={mapPosition}
-        zoom={3}
+        zoom={17}
         scrollWheelZoom={true}
         className={styles.map}
       >

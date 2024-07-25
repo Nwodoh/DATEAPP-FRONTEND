@@ -6,9 +6,9 @@ import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./pages/ProtectedRoute";
 
 import ChatList from "./components/ChatList";
-import Form from "./components/Form";
 import SpinnerFullPage from "./components/SpinnerFullPage";
 import ChatPage from "./components/ChatPage";
+import Likes from "./components/Likes";
 
 const Homepage = lazy(() => import("./pages/Homepage"));
 const About = lazy(() => import("./pages/About"));
@@ -48,7 +48,7 @@ function App() {
                 <Route index element={<Navigate replace to="chats" />} />
                 <Route path="chats" element={<ChatList />} />
                 <Route path="chats/:otherUserId" element={<ChatPage />} />
-                <Route path="form" element={<Form />} />
+                <Route path="likes" element={<Likes />} />
               </Route>
               <Route path="*" element={<PageNotFound />} />
             </Routes>

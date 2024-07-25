@@ -130,25 +130,27 @@ function ChatsProvider({ children }) {
       });
 
       const data = await res.json();
-      if (data.status !== "success") throw new Error();
+      if (data.status !== "success") throw new Error(data?.message);
 
       if (
         !chats.find((chat) => chat.other_user.id === data.newChat.other_user.id)
-      ) {
-        console.log("new!!!!!");
+      )
         dispatch({
           type: "chat/newPerson",
           payload: data.newChat,
         });
-      } else console.log("Old");
 
       dispatch({
         type: "chat/new",
         payload: data.newChat,
       });
       socket.emit("chat/sent", data.newChat);
-    } catch {
-      alert("Error Sending Message, Please check your internet connection.");
+    } catch (err) {
+      console.log(err);
+      alert(
+        err.message ||
+          "Error Sending Message, Please check your internet connection."
+      );
     }
   }
 

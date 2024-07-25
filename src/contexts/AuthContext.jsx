@@ -4,8 +4,10 @@ import {
   useContext,
   useEffect,
   useReducer,
+  useState,
 } from "react";
 import { socket } from "../socket";
+import { useGeolocation } from "../hooks/useGeolocation";
 
 const AuthContext = createContext();
 const BASE_API = "http://127.0.0.1:5000/api/v1";
@@ -55,27 +57,58 @@ function reducer(state, action) {
 }
 
 function AuthProvider({ children }) {
+  const { getPosition } = useGeolocation();
   const [{ user, isAuthenticated, allUsers }, dispatch] = useReducer(
     reducer,
     initialState
   );
+  const [mapPosition, setMapPosition] = useState([0, 0]);
 
-  async function getUser(userId = "") {
-    dispatch({ type: "loading" });
+  useEffect(
+    function () {
+      user && setMapPosition(user?.location);
+    },
+    [user]
+  );
 
-    try {
-      const res = await fetch(`${USER_API}/user/${userId}`, {
+  const setUserLocation = useCallback(
+    async function setUserLocation() {
+      const location = await getPosition();
+
+      if (!location?.length) return;
+
+      await fetch(`${USER_API}/`, {
+        method: "POST",
         credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ location }),
       });
-      const data = await res.json();
-      if (data.status !== "success") throw new Error();
-      if (!data.user) throw new Error();
-      dispatch({ type: "login", payload: data.user });
-      return data.user;
-    } catch {
-      dispatch({ type: "logout" });
-    }
-  }
+    },
+    [USER_API]
+  );
+
+  const getUser = useCallback(
+    async function getUser(userId = "") {
+      dispatch({ type: "loading" });
+
+      try {
+        userId || setUserLocation();
+        const res = await fetch(`${USER_API}/user/${userId}`, {
+          credentials: "include",
+        });
+        const data = await res.json();
+        if (data.status !== "success") throw new Error();
+        if (!data.user) throw new Error();
+        userId || dispatch({ type: "login", payload: data.user });
+        return data.user;
+      } catch {
+        dispatch({ type: "logout" });
+      }
+    },
+    [setUserLocation]
+  );
 
   useEffect(() => {
     getUser();
@@ -235,6 +268,8 @@ function AuthProvider({ children }) {
         allUsers,
         getUser,
         like,
+        mapPosition,
+        setMapPosition,
       }}
     >
       {children}
