@@ -16,21 +16,21 @@ function ChatPage() {
   const { getUser } = useAuth();
   const { currentChat, chats, getChat, isLoading, sendChat } = useChats();
 
-  async function storeOtherUser(otherUserId) {
-    const otherUser =
-      chats.find((chat) => chat.other_user.id === Number(otherUserId))
-        ?.other_user || (await getUser(otherUserId));
-    setOtherUser(otherUser);
-  }
-
   useEffect(
     function () {
+      async function storeOtherUser(otherUserId) {
+        const otherUser =
+          chats.find((chat) => chat.other_user.id === Number(otherUserId))
+            ?.other_user || (await getUser(otherUserId));
+        setOtherUser(otherUser);
+      }
+
       async function initOtherUser() {
         await storeOtherUser(otherUserId);
       }
       initOtherUser();
     },
-    [otherUserId]
+    [otherUserId, chats, getUser]
   );
 
   useEffect(

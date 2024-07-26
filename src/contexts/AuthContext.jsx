@@ -89,6 +89,30 @@ function AuthProvider({ children }) {
     [USER_API]
   );
 
+  const updateUser = useCallback(
+    async function updateUser(userData) {
+      try {
+        const res = await fetch(`${USER_API}/`, {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ ...userData }),
+        });
+        const data = await res.json();
+
+        if (data.status !== "success") throw new Error();
+        if (!data.user) throw new Error();
+
+        dispatch({ type: "login", payload: data.user });
+      } catch (err) {
+        alert(`${err.message}. \n Unable to upload updates.`);
+      }
+    },
+    [USER_API]
+  );
+
   const getUser = useCallback(
     async function getUser(userId = "") {
       dispatch({ type: "loading" });
@@ -272,6 +296,7 @@ function AuthProvider({ children }) {
         like,
         mapPosition,
         setMapPosition,
+        updateUser,
       }}
     >
       {children}

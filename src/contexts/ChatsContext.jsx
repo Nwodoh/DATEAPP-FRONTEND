@@ -95,28 +95,31 @@ function ChatsProvider({ children }) {
     [CHAT_API, isAuthenticated]
   );
 
-  const getChat = useCallback(async function getChat(otherUserId) {
-    dispatch({ type: "loading" });
+  const getChat = useCallback(
+    async function getChat(otherUserId) {
+      dispatch({ type: "loading" });
 
-    try {
-      const res = await fetch(`${CHAT_API}/${otherUserId}`, {
-        credentials: "include",
-      });
-      const data = await res.json();
+      try {
+        const res = await fetch(`${CHAT_API}/${otherUserId}`, {
+          credentials: "include",
+        });
+        const data = await res.json();
 
-      if (data.status !== "success") throw new Error();
+        if (data.status !== "success") throw new Error();
 
-      dispatch({
-        type: "chat/loaded",
-        payload: { currentChat: data.chats, activeChat: otherUserId },
-      });
-    } catch (err) {
-      dispatch({
-        type: "rejected",
-        payload: "There was an error loading this chat...",
-      });
-    }
-  }, []);
+        dispatch({
+          type: "chat/loaded",
+          payload: { currentChat: data.chats, activeChat: otherUserId },
+        });
+      } catch (err) {
+        dispatch({
+          type: "rejected",
+          payload: "There was an error loading this chat...",
+        });
+      }
+    },
+    [CHAT_API]
+  );
 
   async function sendChat(receiverId, message) {
     try {
@@ -172,7 +175,7 @@ function ChatsProvider({ children }) {
     return () => {
       socket.off("chat/received", handleChatReceived);
     };
-  }, []);
+  }, [user?.id]);
 
   return (
     <ChatsContext.Provider
