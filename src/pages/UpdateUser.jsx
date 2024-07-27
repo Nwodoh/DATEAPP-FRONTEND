@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import PageNav from "../components/PageNav";
 import { useAuth } from "../contexts/AuthContext";
 import styles from "./UpdateUser.module.css";
-import Img from "../components/Img";
 import Button from "../components/Button";
 import { useNavigate } from "react-router-dom";
 
@@ -14,7 +13,12 @@ function UpdateUser() {
   const [about, setAbout] = useState("");
   const [gender, setGender] = useState("");
   const [orientation, setOrientation] = useState("");
-  const [imageUrls, setImageUrls] = useState(["", ""]);
+  const [imageFormData, setImageFormData] = useState({
+    profile: undefined,
+    background: undefined,
+  });
+  const [profileImgUrl, setProfileImgUrl] = useState("");
+  const [backgroundImgUrl, setBackgroundImgUrl] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState(
     new Date().toISOString().split("T")[0]
   );
@@ -27,36 +31,88 @@ function UpdateUser() {
       user?.gender && setGender(user.gender);
       user?.orientation && setOrientation(user.orientation);
       user?.image_urls &&
-        setImageUrls(
+        setProfileImgUrl(
           user.image_urls.length
-            ? [
-                `${BASE_API}/image/${user.image_urls[0]}`,
-                `${BASE_API}/image/${user.image_urls[1]}`,
-              ]
-            : ["", ""]
+            ? `${BASE_API}/image/${user.image_urls[0]}`
+            : ""
+        );
+      user?.image_urls &&
+        setBackgroundImgUrl(
+          user.image_urls.length
+            ? `${BASE_API}/image/${user.image_urls[1]}`
+            : ""
         );
     },
     [user]
   );
 
+  async function encodeImageToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        resolve(reader.result.split(",")[1]); // Strip out the data URL part
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
-    const userData = { name, username, about, gender, orientation };
+
+    let profileImage =
+      imageFormData.profile &&
+      (await encodeImageToBase64(imageFormData.profile));
+    let backgroundImage =
+      imageFormData.background &&
+      (await encodeImageToBase64(imageFormData.background));
+
+    profileImage = {
+      image: profileImage,
+      filename: imageFormData?.profile?.name,
+    };
+    backgroundImage = {
+      image: backgroundImage,
+      filename: imageFormData?.background?.name,
+    };
+
+    const userData = {
+      name,
+      username,
+      about,
+      gender,
+      orientation,
+      backgroundImage,
+      profileImage,
+      date_of_birth: dateOfBirth,
+    };
     await updateUser(userData);
-    console.log({ name, username, about, gender, orientation });
     navigate("/app/chats");
   }
 
-  function handleAddImage(e) {
+  function handleAddImage(e, isProfile = true) {
+    let url;
     const imgs = e.target.files;
-    // const data = new FormData();
     for (let i = 0; i < imgs.length; i++) {
-      // data.append("photos", files[i]);
-      const url = URL.createObjectURL(imgs[i]);
-      setImageUrls((urls) => {
-        return [url, ...urls];
+      const image = imgs[i];
+      url = URL.createObjectURL(image);
+      setImageFormData((images) => {
+        return isProfile
+          ? { ...images, profile: image }
+          : { ...images, background: image };
       });
     }
+    return url;
+  }
+
+  function handleProfileImage(e) {
+    const url = handleAddImage(e);
+    setProfileImgUrl(url);
+  }
+
+  function handleBackgroundImgUrl(e) {
+    const url = handleAddImage(e, false);
+    setBackgroundImgUrl(url);
   }
 
   return (
@@ -64,19 +120,22 @@ function UpdateUser() {
       <PageNav />
       <form className={styles.form} onSubmit={handleSubmit}>
         <div className={styles.images}>
-          <img src={imageUrls[0]} alt={name} className={styles.profileImage} />
+          <div className={styles.profileImage}>
+            <img src={profileImgUrl} alt={name} />
+            <input type="file" onChange={handleProfileImage} accept="image/*" />
+          </div>
           <div
             className={styles.backgroundImg}
             style={{
-              backgroundImage: `url('${imageUrls[1]}')`,
+              backgroundImage: `url('${backgroundImgUrl}')`,
             }}
-          ></div>
-          <input
-            type="file"
-            onChange={handleAddImage}
-            accept="image/*"
-            multiple
-          />
+          >
+            <input
+              type="file"
+              onChange={handleBackgroundImgUrl}
+              accept="image/*"
+            />
+          </div>
         </div>
         <input
           value={name}

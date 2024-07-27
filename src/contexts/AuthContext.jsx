@@ -269,7 +269,6 @@ function AuthProvider({ children }) {
       const data = await res.json();
       if (data.status !== "success") throw new Error(data.message);
     } catch (err) {
-      console.log();
       alert(err.message || "Unable to like user's profile");
     }
   }

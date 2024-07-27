@@ -101,7 +101,9 @@ function Map() {
                 <div
                   className={styles.profileImages}
                   style={{
-                    backgroundImage: `url('${BASE_API}/image/${user.image_urls[0]}')`,
+                    backgroundImage: `url('${BASE_API}/image/${
+                      user.image_urls[1] || user.image_urls[0]
+                    }')`,
                   }}
                 >
                   <Img imgLink={user.image_urls[0]} />
