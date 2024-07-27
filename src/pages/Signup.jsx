@@ -16,7 +16,7 @@ function Signup({ type = "signup" }) {
 }
 
 function SignupForm() {
-  const [email, setEmail] = useState("mickdaniels101@gmail.com");
+  const [email, setEmail] = useState("");
   const { sendOtp } = useAuth();
   const navigate = useNavigate();
 
@@ -53,9 +53,9 @@ function SignupForm() {
 function VerificationForm() {
   // PRE-FILL FOR DEV PURPOSES
   const navigate = useNavigate();
-  const [otp, setOtp] = useState("001201");
-  const [password, setPassword] = useState("qwerty");
-  const [passwordConfirm, setPasswordConfirm] = useState("qwerty");
+  const [otp, setOtp] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordConfirm, setPasswordConfirm] = useState("");
   const { user, signup } = useAuth();
   const email = user?.email;
 

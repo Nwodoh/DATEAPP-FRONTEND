@@ -28,8 +28,8 @@ export default function Login({ type = "login" }) {
 
 function LoginForm() {
   // PRE-FILL FOR DEV PURPOSES
-  const [email, setEmail] = useState("mickdaniels101@gmail.com");
-  const [password, setPassword] = useState("1234567");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const { login } = useAuth();
 
   function handleSubmit(e) {
@@ -72,7 +72,7 @@ function LoginForm() {
 
 function ForgotPassword() {
   // PRE-FILL FOR DEV PURPOSES
-  const [email, setEmail] = useState("mickdaniels101@gmail.com");
+  const [email, setEmail] = useState("");
   const { sendOtp } = useAuth();
   const navigate = useNavigate();
 
@@ -111,9 +111,9 @@ function ForgotPassword() {
 
 function ResetPassword() {
   // PRE-FILL FOR DEV PURPOSES
-  const [otp, setOtp] = useState("001201");
-  const [password, setPassword] = useState("qwerty");
-  const [passwordConfirm, setPasswordConfirm] = useState("qwerty");
+  const [otp, setOtp] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordConfirm, setPasswordConfirm] = useState("");
   const { user, resetPassword } = useAuth();
   const email = user?.email;
 
