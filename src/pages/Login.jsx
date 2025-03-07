@@ -4,6 +4,7 @@ import Button from "../components/Button";
 import PageNav from "../components/PageNav";
 import { useAuth } from "../contexts/AuthContext";
 import styles from "./Login.module.css";
+import HomeWrapper from "../components/HomeWrapper";
 
 export default function Login({ type = "login" }) {
   const navigate = useNavigate();
@@ -17,12 +18,11 @@ export default function Login({ type = "login" }) {
   );
 
   return (
-    <main className={styles.login}>
-      <PageNav />
+    <HomeWrapper bgImage="/bg/pexels-fmaderebner-340566-1.jpg">
       {type === "login" && <LoginForm />}
       {type === "forgot-password" && <ForgotPassword />}
       {type === "reset-password" && <ResetPassword />}
-    </main>
+    </HomeWrapper>
   );
 }
 

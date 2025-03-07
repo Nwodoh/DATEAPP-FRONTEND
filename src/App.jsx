@@ -10,6 +10,8 @@ import SpinnerFullPage from "./components/SpinnerFullPage";
 import ChatPage from "./components/ChatPage";
 import Likes from "./components/Likes";
 import UpdateUser from "./pages/UpdateUser";
+import { AnimatePresence } from "motion/react";
+import PageNav from "./components/PageNav";
 
 const Homepage = lazy(() => import("./pages/Homepage"));
 const About = lazy(() => import("./pages/About"));
@@ -23,6 +25,7 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <ChatsProvider>
+          <PageNav />
           <Suspense fallback={<SpinnerFullPage />}>
             <Routes>
               <Route index element={<Homepage />} />

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import PageNav from "../components/PageNav";
 import { useAuth } from "../contexts/AuthContext";
 import styles from "./UpdateUser.module.css";
 import Button from "../components/Button";
 import { useNavigate } from "react-router-dom";
+import HomeWrapper from "../components/HomeWrapper";
 
 function UpdateUser() {
   const navigate = useNavigate();
@@ -116,8 +116,7 @@ function UpdateUser() {
   }
 
   return (
-    <main className={styles.page}>
-      <PageNav />
+    <HomeWrapper bgImage="/bg/pexels-fmaderebner-340566-1.jpg">
       <form className={styles.form} onSubmit={handleSubmit}>
         <div className={styles.images}>
           <div className={styles.profileImage}>
@@ -194,7 +193,7 @@ function UpdateUser() {
           <Button type="primary">Update</Button>
         </div>
       </form>
-    </main>
+    </HomeWrapper>
   );
 }
 

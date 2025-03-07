@@ -1,17 +1,16 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Button from "../components/Button";
-import PageNav from "../components/PageNav";
 import { useAuth } from "../contexts/AuthContext";
 import styles from "./Login.module.css";
+import HomeWrapper from "../components/HomeWrapper";
 
 function Signup({ type = "signup" }) {
   return (
-    <main className={styles.login}>
-      <PageNav />
+    <HomeWrapper bgImage="/bg/pexels-fmaderebner-340566-1.jpg">
       {type === "signup" && <SignupForm />}
       {type === "verify" && <VerificationForm />}
-    </main>
+    </HomeWrapper>
   );
 }
 
