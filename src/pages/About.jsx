@@ -3,7 +3,6 @@ import { ArrowUpRight } from "@phosphor-icons/react";
 import GlassCTA from "../components/GlassCTA";
 import HomeWrapper from "../components/HomeWrapper";
 import {
-  ArrowLongRightIcon,
   ChatBubbleLeftEllipsisIcon,
   GlobeEuropeAfricaIcon,
   MagnifyingGlassIcon,
