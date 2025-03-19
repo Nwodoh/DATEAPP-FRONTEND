@@ -1,17 +1,20 @@
-import { NavLink } from "react-router-dom";
-import styles from "./AppNav.module.css";
+import { useNavigate } from "react-router-dom";
+import PageControls from "./PageControls";
 
-function AppNav() {
+function AppNav({ className }) {
+  const navigate = useNavigate();
+
+  function handleClick(lable = "") {
+    navigate(`./${lable.toLowerCase()}`);
+  }
+
   return (
-    <nav className={styles.nav}>
-      <ul>
-        <li>
-          <NavLink to="chats">Chats</NavLink>
-        </li>
-        <li>
-          <NavLink to="likes">likes</NavLink>
-        </li>
-      </ul>
+    <nav className={className}>
+      <PageControls
+        labels={["Chats", "likes", "map"]}
+        color="white"
+        handleClick={handleClick}
+      />
     </nav>
   );
 }

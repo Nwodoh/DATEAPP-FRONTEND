@@ -1,5 +1,4 @@
 import Spinner from "./Spinner";
-import styles from "./ChatList.module.css";
 import ChatListItem from "./ChatListItem";
 import Message from "./Message";
 import { useChats } from "../contexts/ChatsContext";
@@ -13,7 +12,7 @@ function ChatList() {
     return <Message message="Chat with someone new by clicking on the map." />;
 
   return (
-    <ul className={styles.chatList}>
+    <ul className="max-h-[100%] flex flex-col grow overflow-y-auto">
       {chats.map((chat) => (
         <ChatListItem chat={chat} key={chat.other_user.id} />
       ))}

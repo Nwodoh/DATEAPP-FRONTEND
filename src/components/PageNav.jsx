@@ -41,6 +41,8 @@ function PageNav() {
     }
   }, [currentPath, navs]);
 
+  if (currentPath.toLocaleLowerCase().startsWith("/app")) return null;
+
   return (
     <nav className="absolute w-full p-4 flex justify-between text-white z-10">
       <Logo />

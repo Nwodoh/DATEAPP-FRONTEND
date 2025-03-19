@@ -12,7 +12,6 @@ import styles from "./Map.module.css";
 import { useEffect, useState } from "react";
 import { useGeolocation } from "../hooks/useGeolocation";
 import { useUrlPosition } from "../hooks/useUrlPosition";
-import Button from "./Button";
 import Img from "./Img";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -77,7 +76,7 @@ function Map() {
   }
 
   return (
-    <div className={styles.mapContainer}>
+    <div className={`${styles.mapContainer} h-svh`}>
       <MapContainer
         center={mapPosition}
         zoom={17}

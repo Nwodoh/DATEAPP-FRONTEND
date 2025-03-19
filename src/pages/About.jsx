@@ -67,19 +67,19 @@ export default function About() {
               <div className="mt-6 flex justify-between">
                 <MissionImage
                   text="Travel With Partners"
-                  bgImage="bg-[url('/assets/pexels-katia-miasoed-624959709-17877489.jpg')]"
+                  bgImage="bg-[url('/assets/pexels-katia-miasoed-624959709-17877489-min.jpg')]"
                 />
                 <MissionImage
                   text="Explore New Things"
-                  bgImage="bg-[url('/assets/pexels-cristian-rojas-8866003.jpg')]"
+                  bgImage="bg-[url('/assets/pexels-cristian-rojas-8866003-min.jpg')]"
                 />
                 <MissionImage
                   text="Visit Serene Places"
-                  bgImage="bg-[url('/assets/pexels-ollivves-1020016.jpg')]"
+                  bgImage="bg-[url('/assets/pexels-ollivves-1020016-min.jpg')]"
                 />
                 <MissionImage
                   text="Anywhere on the Globe"
-                  bgImage="bg-[url('/assets/pexels-nastyasensei-66707-335393.jpg')]"
+                  bgImage="bg-[url('/assets/pexels-nastyasensei-66707-335393-min.jpg')]"
                 />
               </div>
             </div>
