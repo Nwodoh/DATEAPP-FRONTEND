@@ -79,7 +79,7 @@ function PageNav() {
   );
 }
 
-function NavigationLink({ to, className, children }) {
+function NavigationLink({ to, className = "", children }) {
   return (
     <li>
       <NavLink to={to} className={`inline-block py-4 px-1 ${className}`}>

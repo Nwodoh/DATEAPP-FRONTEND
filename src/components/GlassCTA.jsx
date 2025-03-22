@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-function GlassCTA({ to, className, type, children }) {
+function GlassCTA({ to, className = "", type, children }) {
   if (type === "button")
     return (
       <button

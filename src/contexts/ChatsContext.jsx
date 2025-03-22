@@ -4,6 +4,7 @@ import {
   useContext,
   useReducer,
   useCallback,
+  useState,
 } from "react";
 import { useAuth } from "./AuthContext";
 import { socket } from "../socket";
@@ -71,6 +72,7 @@ function ChatsProvider({ children }) {
   const CHAT_API = `${BASE_API}/chat`;
   const [{ chats, isLoading, currentChat, activeChat, error }, dispatch] =
     useReducer(reducer, initialState);
+  const [showExplorer, setShowExplorer] = useState(false);
 
   useEffect(
     function () {
@@ -188,6 +190,8 @@ function ChatsProvider({ children }) {
         activeChat,
         sendChat,
         clearChatState,
+        showExplorer,
+        setShowExplorer,
       }}
     >
       {children}

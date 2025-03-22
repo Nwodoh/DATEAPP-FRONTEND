@@ -9,8 +9,8 @@ import ChatList from "./components/ChatList";
 import SpinnerFullPage from "./components/SpinnerFullPage";
 import ChatPage from "./components/ChatPage";
 import Likes from "./components/Likes";
-import UpdateUser from "./pages/UpdateUser";
 import PageNav from "./components/PageNav";
+import ProfilePage from "./components/ProfilePage";
 
 const Homepage = lazy(() => import("./pages/Homepage"));
 const About = lazy(() => import("./pages/About"));
@@ -31,7 +31,6 @@ function App() {
               <Route path="about" element={<About />} />
               <Route path="signup" element={<Signup />} />
               <Route path="signup/verify" element={<Signup type="verify" />} />
-              <Route path="update" element={<UpdateUser />} />
               <Route path="login" element={<Login />} />
               <Route
                 path="forgot-password"
@@ -53,6 +52,8 @@ function App() {
                 <Route path="chats" element={<ChatList />} />
                 <Route path="chats/:otherUserId" element={<ChatPage />} />
                 <Route path="likes" element={<Likes />} />
+                <Route path="profile" element={<ProfilePage />} />
+                <Route path="profile/:otherUserId" element={<ProfilePage />} />
               </Route>
               <Route path="*" element={<PageNotFound />} />
             </Routes>

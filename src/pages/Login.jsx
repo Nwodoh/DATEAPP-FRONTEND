@@ -215,46 +215,5 @@ function ResetPassword() {
         </GlassForm>
       </div>
     </div>
-    // <form className={styles.form} onSubmit={handleSubmit}>
-    //   <div className={styles.row}>
-    //     <label htmlFor="otp">6 digit OTP sent to {email}</label>
-    //     <input
-    //       type="text"
-    //       id="otp"
-    //       maxLength={6}
-    //       value={otp}
-    //       onChange={(e) => setOtp(e.target.value)}
-    //       required
-    //     />
-    //   </div>
-    //   <div className={styles.row}>
-    //     <label htmlFor="password">New Password</label>
-    //     <input
-    //       type="password"
-    //       id="password"
-    //       minLength={5}
-    //       onChange={(e) => setPassword(e.target.value)}
-    //       value={password}
-    //       required
-    //     />
-    //   </div>
-    //   <div className={styles.row}>
-    //     <label htmlFor="passwordConfirm">Confirm Password</label>
-    //     <input
-    //       type="password"
-    //       id="passwordConfirm"
-    //       minLength={5}
-    //       onChange={(e) => setPasswordConfirm(e.target.value)}
-    //       value={passwordConfirm}
-    //       required
-    //     />
-    //     <Link to="/forgot-password" className={styles.forgotPassLink}>
-    //       No otp? Generate One
-    //     </Link>
-    //   </div>
-    //   <div>
-    //     <Button type="primary">Reset Password</Button>
-    //   </div>
-    // </form>
   );
 }

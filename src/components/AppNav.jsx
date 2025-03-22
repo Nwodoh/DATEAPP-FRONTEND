@@ -1,11 +1,14 @@
 import { useNavigate } from "react-router-dom";
+import { useChats } from "../contexts/ChatsContext";
 import PageControls from "./PageControls";
 
 function AppNav({ className }) {
+  const { setShowExplorer } = useChats();
   const navigate = useNavigate();
 
-  function handleClick(lable = "") {
-    navigate(`./${lable.toLowerCase()}`);
+  function handleClick(label = "") {
+    if (label === "map") setShowExplorer(true);
+    else navigate(`./${label.toLowerCase()}`);
   }
 
   return (

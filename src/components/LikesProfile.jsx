@@ -1,36 +1,40 @@
 import { Link } from "react-router-dom";
-import Img from "./Img";
-import styles from "./LikesProfile.module.css";
 import { useAuth } from "../contexts/AuthContext";
+import { ChatBubbleLeftEllipsisIcon } from "@heroicons/react/16/solid";
 
 function LikesProfile({ user }) {
-  const { setMapPosition } = useAuth();
+  const { setMapPosition, BASE_API } = useAuth();
+  const IMG_API = `${BASE_API}/image`;
 
   function handelProfileClick(userLocation) {
     setMapPosition(userLocation);
   }
 
   return (
-    <button
-      className={styles.profile}
+    <div
+      className="flex flex-col items-center w-[43%] rounded bg-white/10 border-[0.1px] border-white/37 p-2.5  mb-6 hover:bg-white/37 transition-all"
       onClick={() => {
         handelProfileClick(user.location);
       }}
     >
-      <Img classnames={styles.img} imgLink={user.image_urls[0]} />
-      <div className={styles.details}>
-        <span className={styles.name}>{user.name}</span>
-        <span className={styles.username}>@{user.username}</span>
+      <div
+        className={`w-16 h-16 border-[2px] mb-3.5 shrink-0 rounded-full bg-cover bg-white/37 bg-center`}
+        style={{
+          backgroundImage: `url('${IMG_API}/${user.image_urls[0]}')`,
+        }}
+      ></div>
+      <div className="text-sm max-w-[95%] overflow-hidden whitespace-nowrap text-ellipsis">
+        <span className="text-base">{user.name}</span>
+        <span className="leading-0">@{user.username}</span>
       </div>
-      <div className={styles.actions}>
-        <Link data-type="chat" to={`/app/chats/${user.id}`}>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-            <path d="M160 368c26.5 0 48 21.5 48 48l0 16 72.5-54.4c8.3-6.2 18.4-9.6 28.8-9.6L448 368c8.8 0 16-7.2 16-16l0-288c0-8.8-7.2-16-16-16L64 48c-8.8 0-16 7.2-16 16l0 288c0 8.8 7.2 16 16 16l96 0zm48 124l-.2 .2-5.1 3.8-17.1 12.8c-4.8 3.6-11.3 4.2-16.8 1.5s-8.8-8.2-8.8-14.3l0-21.3 0-6.4 0-.3 0-4 0-48-48 0-48 0c-35.3 0-64-28.7-64-64L0 64C0 28.7 28.7 0 64 0L448 0c35.3 0 64 28.7 64 64l0 288c0 35.3-28.7 64-64 64l-138.7 0L208 492z" />
-          </svg>
-          <span>Chat</span>
-        </Link>
-      </div>
-    </button>
+      <Link
+        to={`/app/chats/${user.id}`}
+        className="mt-1.5 flex items-center justify-around gap-1.5 text-xs py-1.5 rounded-[8px] px-2 transition-all bg-[#26afeb]/15 hover:bg-[#26afeb]/80"
+      >
+        <ChatBubbleLeftEllipsisIcon className="w-4 h-4" />
+        <span>Chat</span>
+      </Link>
+    </div>
   );
 }
 

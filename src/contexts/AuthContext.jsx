@@ -107,7 +107,7 @@ function AuthProvider({ children }) {
 
         dispatch({ type: "login", payload: data.user });
       } catch (err) {
-        alert(`${err.message}. \n Unable to upload updates.`);
+        throw new Error(`${err.message}. \n Unable to upload updates.`);
       }
     },
     [USER_API]
@@ -229,7 +229,6 @@ function AuthProvider({ children }) {
 
       const data = await res.json();
       if (data.status !== "success") throw new Error(data.message);
-
       dispatch({ type: "login", payload: data.user });
     } catch {
       dispatch({ type: "loaded" });

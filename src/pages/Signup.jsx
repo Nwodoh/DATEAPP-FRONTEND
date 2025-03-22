@@ -74,11 +74,11 @@ function VerificationForm() {
   const { user, signup } = useAuth();
   const email = user?.email;
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     try {
       e.preventDefault();
-      signup({ email, password, passwordConfirm, otp });
-      navigate("/update");
+      await signup({ email, password, passwordConfirm, otp });
+      navigate("/app/profile");
     } catch (err) {
       alert(err);
     }

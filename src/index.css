@@ -34,30 +34,6 @@ body {
   font-style: normal;
 }
 
-label {
-  font-size: 1.6rem;
-  font-weight: 600;
-}
-
-/* input,
-select,
-textarea {
-  width: 100%;
-  padding: 0.8rem 1.2rem;
-  font-family: inherit;
-  font-size: 1.6rem;
-  border: none;
-  border-radius: 5px;
-  background-color: var(--color-light--3);
-  transition: all 0.2s;
-}
-
-input:focus,
-select:focus {
-  outline: none;
-  background-color: #fff;
-} */
-
 .cta:link,
 .cta:visited {
   display: inline-block;
@@ -147,4 +123,56 @@ select:focus {
 .btn-glass:active::after {
   transition: 0s;
   transform: translate(0, 5%);
+}
+
+.spinnerContainer {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinner {
+  width: 6rem;
+  height: 6rem;
+  border-radius: 50%;
+  background: conic-gradient(#0000 10%, var(--color-light--2));
+  mask: radial-gradient(farthest-side, #0000 calc(100% - 8px), #000 0);
+  -webkit-mask: radial-gradient(farthest-side, #0000 calc(100% - 8px), #000 0);
+  animation: rotate 1.5s infinite linear;
+}
+
+@keyframes rotate {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+.marker-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 99999px;
+  min-width: 40px;
+  min-height: 40px;
+}
+
+:global(.leaflet-popup .leaflet-popup-content-wrapper) {
+  background-color: var(--color-dark--1);
+  color: var(--color-light--2);
+  border-radius: 5px;
+}
+
+:global(.leaflet-popup-content) {
+  margin: 0 !important;
+  width: 100%;
+}
+
+:global(.leaflet-popup .leaflet-popup-tip) {
+  background-color: var(--color-dark--1);
+}
+
+:global(.leaflet-popup-content-wrapper) {
+  overflow: hidden;
+  border-left: 5px solid var(--color-brand--2);
+  width: 35rem;
 }

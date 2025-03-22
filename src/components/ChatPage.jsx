@@ -47,7 +47,7 @@ function ChatPage() {
     <div className="flex flex-col h-[100%] overflow-hidden relative">
       <header className="absolute top-0 left-0 w-full flex gap-2 items-center">
         <div
-          className={`h-11 w-11 shrink-0 rounded-full bg-cover bg-white/37 bg-center`}
+          className="h-11 w-11 shrink-0 rounded-full bg-cover bg-white/37 bg-center"
           style={{
             backgroundImage: `url('${IMG_API}/${otherUser.image_urls[0]}')`,
           }}
