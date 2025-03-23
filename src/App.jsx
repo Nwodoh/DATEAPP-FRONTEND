@@ -12,12 +12,12 @@ import Likes from "./components/Likes";
 import PageNav from "./components/PageNav";
 import ProfilePage from "./components/ProfilePage";
 
-const Homepage = lazy(() => import("./pages/Homepage"));
-const About = lazy(() => import("./pages/About"));
-const Signup = lazy(() => import("./pages/Signup"));
-const Login = lazy(() => import("./pages/Login"));
-const AppLayout = lazy(() => import("./pages/AppLayout"));
-const PageNotFound = lazy(() => import("./pages/PageNotFound"));
+import Homepage from "./pages/Homepage";
+import About from "./pages/About";
+import Signup from "./pages/Signup";
+import Login from "./pages/Login";
+import AppLayout from "./pages/AppLayout";
+import PageNotFound from "./pages/PageNotFound";
 
 function App() {
   return (
