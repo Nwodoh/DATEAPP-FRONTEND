@@ -198,6 +198,7 @@ function ProfilePage() {
         style={{
           backgroundImage: `url('${backgroundImgUrl}')`,
           backgroundSize: "cover",
+          backgroundPosition: "center",
         }}
       >
         <input

@@ -125,7 +125,7 @@ body {
   transform: translate(0, 5%);
 }
 
-.spinnerContainer {
+.spinner-container {
   height: 100%;
   display: flex;
   align-items: center;
