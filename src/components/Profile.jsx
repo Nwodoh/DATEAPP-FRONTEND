@@ -1,9 +1,8 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import Img from "./Img";
 
 function Profile() {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, BASE_API } = useAuth();
 
   if (isLoading || !user)
     return (
@@ -17,11 +16,13 @@ function Profile() {
       to={`/app/profile/${user.id}`}
       className="flex rounded-full border-3 border-white/37"
     >
-      <Img
-        classnames="w-9 h-9 bg-white/37 rounded-full"
-        imgLink={user.image_urls[0]}
-        alt={user.name}
-      />
+      <div
+        className="w-9 h-9 bg-white/37 rounded-full overflow-hidden"
+        style={{
+          backgroundImage: `url('${BASE_API}/image/${user.profile_image}')`,
+          backgroundSize: "cover",
+        }}
+      ></div>
     </Link>
   );
 }

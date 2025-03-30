@@ -35,12 +35,20 @@ export default function Login({ type = "login" }) {
 function LoginForm() {
   // PRE-FILL FOR DEV PURPOSES
   const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [password, setPassword] = useState("");
   const { login } = useAuth();
 
-  function handleSubmit(e) {
-    e.preventDefault();
-    if (email && password) login(email, password);
+  async function handleSubmit(e) {
+    try {
+      e.preventDefault();
+      setIsSubmitting(true);
+      if (email && password) await login(email, password);
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -77,6 +85,7 @@ function LoginForm() {
           <GlassCTA
             type="button"
             className="before:bg-stone-900/80 w-min mt-1.5"
+            isLoading={isSubmitting}
           >
             Login
           </GlassCTA>
@@ -91,15 +100,19 @@ function ForgotPassword() {
   const [email, setEmail] = useState("");
   const { sendOtp } = useAuth();
   const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(e) {
     try {
       e.preventDefault();
       if (!email) return;
+      setIsSubmitting(true);
       await sendOtp(email, "reset_password");
       navigate("/reset-password");
     } catch (err) {
       alert(err.message);
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -130,6 +143,7 @@ function ForgotPassword() {
           <GlassCTA
             type="button"
             className="before:bg-stone-900/80 w-min mt-1.5"
+            isLoading={isSubmitting}
           >
             Get OTP
           </GlassCTA>
@@ -141,6 +155,7 @@ function ForgotPassword() {
 
 function ResetPassword() {
   // PRE-FILL FOR DEV PURPOSES
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [otp, setOtp] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
@@ -150,6 +165,7 @@ function ResetPassword() {
   async function handleSubmit(e) {
     try {
       e.preventDefault();
+      setIsSubmitting(true);
       if (!email)
         throw new Error(
           "Your email was not found, Please regenerate a new token or try loggin in again."
@@ -157,6 +173,8 @@ function ResetPassword() {
       await resetPassword({ email, password, passwordConfirm, otp });
     } catch (err) {
       alert(err.message);
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -209,6 +227,7 @@ function ResetPassword() {
           <GlassCTA
             type="button"
             className="before:bg-stone-900/80 w-min mt-1.5"
+            isLoading={isSubmitting}
           >
             Reset Password
           </GlassCTA>

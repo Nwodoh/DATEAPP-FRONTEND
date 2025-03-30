@@ -12,9 +12,8 @@ function ProfilePage() {
   const navigate = useNavigate();
   const { user, getUser, BASE_API, updateUser, like, logout } = useAuth();
   const { clearChatState } = useChats();
-  const otherUserId = useParams()?.otherUserId || user.id;
-  const [likedUsers, setLikedUsers] = useState(user?.likedUsers || []);
-  const likedOtherUser = likedUsers.includes(Number(otherUserId));
+  console.log("USERRRR", user);
+  const otherUserId = useParams()?.otherUserId || user?.id;
   const [otherUser, setOtherUser] = useState(undefined);
   const isMe = user?.id === otherUser?.id;
   const [allowEdit, setAllowEdit] = useState(false);
@@ -31,6 +30,8 @@ function ProfilePage() {
 
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
+  const [otherUserLikes, setOtherUserLikes] = useState([]);
+  const likedOtherUser = otherUserLikes?.includes?.(user?.id || undefined);
   const [about, setAbout] = useState("");
   const [gender, setGender] = useState(null);
   const [orientation, setOrientation] = useState(null);
@@ -39,10 +40,10 @@ function ProfilePage() {
     background: undefined,
   });
   const [profileImgUrl, setProfileImgUrl] = useState(
-    `${BASE_API}/image/${otherUser?.image_urls[1]}`
+    `${BASE_API}/image/${otherUser?.background_image}`
   );
   const [backgroundImgUrl, setBackgroundImgUrl] = useState(
-    `${BASE_API}/image/${otherUser?.image_urls[0]}`
+    `${BASE_API}/image/${otherUser?.profile_image}`
   );
   const [dateOfBirth, setDateOfBirth] = useState(minDOB);
 
@@ -50,12 +51,14 @@ function ProfilePage() {
     function (otherUser) {
       setOtherUser(otherUser);
       setName(otherUser.name);
+      setOtherUserLikes(otherUser.likes);
       setUsername(otherUser.username);
       setAbout(otherUser.about);
       setGender(otherUser.gender);
       setOrientation(otherUser.orientation);
-      setBackgroundImgUrl(`${BASE_API}/image/${otherUser.image_urls[1]}`);
-      setProfileImgUrl(`${BASE_API}/image/${otherUser.image_urls[0]}`);
+      setBackgroundImgUrl(`${BASE_API}/image/${otherUser.background_image}`);
+      setProfileImgUrl(`${BASE_API}/image/${otherUser.profile_image}`);
+      console.log(`${BASE_API}/image/${otherUser.profile_image}`);
       setDateOfBirth(() => {
         try {
           return new Date(otherUser.date_of_birth)
@@ -72,7 +75,9 @@ function ProfilePage() {
   useEffect(
     function () {
       async function setUser() {
+        console.log("here");
         const otherUser = await getUser(otherUserId);
+        console.log("otherUser: ", otherUser);
         if (!otherUser) return;
         initUserState(otherUser);
       }
@@ -174,13 +179,13 @@ function ProfilePage() {
   }
 
   async function handleLike() {
-    if (likedUsers.includes(otherUser.id)) {
-      setLikedUsers((likes) =>
-        likes.filter((likeId) => likeId !== otherUser.id)
+    if (otherUserLikes.includes(user.id)) {
+      setOtherUserLikes((likes) =>
+        likes.filter((likeId) => likeId !== user.id)
       );
       await like(otherUser.id, true);
     } else {
-      setLikedUsers((likes) => [...likes, otherUser.id]);
+      setOtherUserLikes((likes) => [...likes, user.id]);
       await like(otherUser.id);
     }
   }
@@ -192,7 +197,7 @@ function ProfilePage() {
   }
 
   return (
-    <form className="max-h-[100%] overflow-y-auto" onSubmit={handleSubmit}>
+    <form className="max-h-[100%] pb-3 overflow-y-auto" onSubmit={handleSubmit}>
       <div
         className="relative h-30 bg-white/10"
         style={{
@@ -307,6 +312,7 @@ function ProfilePage() {
             <input
               className="font-extralight text-sm bg-white/10 p-2"
               value={about}
+              placeholder="About"
               onChange={(e) => setAbout(e.target.value)}
               disabled={disableInputs}
             />
@@ -324,7 +330,7 @@ function ProfilePage() {
               disabled={disableInputs}
               value={gender}
               onChange={(e) => setGender(e.target.value)}
-              defaultValue="male"
+              defaultValue={gender || ""}
               required
             >
               <option className="bg-blue-300" value="" disabled>
@@ -359,11 +365,11 @@ function ProfilePage() {
               disabled={disableInputs}
               value={orientation}
               onChange={(e) => setOrientation(e.target.value)}
-              defaultValue="female"
+              defaultValue={gender || ""}
               required
             >
               <option className="bg-blue-300" value="" disabled>
-                Orientation
+                Your orientation
               </option>
               <option className="bg-blue-300" value="male">
                 male
@@ -417,7 +423,7 @@ function ProfilePage() {
             e.preventDefault();
             handleLogout();
           }}
-          className="mx-auto mt-3 flex w-[99%] justify-center bg-white/10 p-2 border-[0.1px] border-white/37 transition-all hover:bg-white/37 active:bg-transparent"
+          className="mx-auto mt-8 flex w-[99%] justify-center bg-red-500/10 p-2 transition-all hover:bg-red-500/37 active:bg-transparent text-red-500 font-bold"
         >
           Logout
         </button>

@@ -74,6 +74,7 @@ function AuthProvider({ children }) {
   const setUserLocation = useCallback(
     async function setUserLocation() {
       const location = await getPosition();
+      console.log("setUserLocation");
 
       if (!location?.length) return;
 
@@ -82,6 +83,7 @@ function AuthProvider({ children }) {
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("login-token")}`,
         },
         body: JSON.stringify({ location }),
       });
@@ -97,6 +99,7 @@ function AuthProvider({ children }) {
           credentials: "include",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("login-token")}`,
           },
           body: JSON.stringify({ ...userData }),
         });
@@ -116,11 +119,16 @@ function AuthProvider({ children }) {
   const getUser = useCallback(
     async function getUser(userId = "") {
       dispatch({ type: "loading" });
+      console.log("GET USER");
 
       try {
         userId || setUserLocation();
+        console.log("URL: ", `${USER_API}/user/${userId}`);
         const res = await fetch(`${USER_API}/user/${userId}`, {
           credentials: "include",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("login-token")}`,
+          },
         });
         const data = await res.json();
         if (data.status !== "success") throw new Error();
@@ -156,6 +164,7 @@ function AuthProvider({ children }) {
       if (!data.user) throw new Error("User not Found.");
 
       dispatch({ type: "login", payload: data.user });
+      localStorage.setItem("login-token", data.idToken);
     } catch (err) {
       dispatch({ type: "loaded" });
       dispatch({ type: "loading" });
@@ -170,7 +179,7 @@ function AuthProvider({ children }) {
     try {
       if (!email) return;
       if (!type) throw new Error("OTP type not set @ sendOTP");
-      const res = await fetch(`${AUTH_API}/otp/${type}`, {
+      const res = await fetch(`${AUTH_API}/verification/${type}`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -202,13 +211,13 @@ function AuthProvider({ children }) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(userData),
-        credentials: "include",
       });
 
       const data = await res.json();
       if (data.status !== "success") throw new Error(data.message);
 
       dispatch({ type: "login", payload: data.user });
+      localStorage.setItem("login-token", data.idToken);
     } catch (err) {
       dispatch({ type: "loaded" });
       alert(err.message);
@@ -216,24 +225,20 @@ function AuthProvider({ children }) {
   }
 
   async function signup(userData) {
-    try {
-      if (!userData?.email) return;
-      const res = await fetch(`${AUTH_API}/signup`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
-      });
+    if (!userData?.email) return;
+    const res = await fetch(`${AUTH_API}/signup`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userData),
+    });
 
-      const data = await res.json();
-      if (data.status !== "success") throw new Error(data.message);
-      dispatch({ type: "login", payload: data.user });
-    } catch {
-      dispatch({ type: "loaded" });
-      alert("Error with signing up");
-    }
+    const data = await res.json();
+    if (data.status !== "success") throw new Error(data.message);
+    dispatch({ type: "login", payload: data.user });
+    localStorage.setItem("login-token", data.idToken);
   }
 
   const getUsersAroundPoint = useCallback(async function getUsersAroundPoint(
@@ -247,6 +252,9 @@ function AuthProvider({ children }) {
     try {
       const res = await fetch(`${USER_API}/?lat=${lat}&lon=${lon}`, {
         credentials: "include",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("login-token")}`,
+        },
       });
       const data = await res.json();
 
@@ -259,11 +267,14 @@ function AuthProvider({ children }) {
   },
   []);
 
-  async function like(userId, isUnlike = false) {
+  async function like(userId, isRemovelike = false) {
     try {
       const res = await fetch(`${USER_API}/like/${userId}`, {
-        method: isUnlike ? "DELETE" : "POST",
+        method: isRemovelike ? "DELETE" : "POST",
         credentials: "include",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("login-token")}`,
+        },
       });
       const data = await res.json();
       if (data.status !== "success") throw new Error(data.message);
@@ -273,7 +284,8 @@ function AuthProvider({ children }) {
   }
 
   async function logout() {
-    await fetch(`${AUTH_API}/logout`, { credentials: "include" });
+    // await fetch(`${AUTH_API}/logout`, { credentials: "include" });
+    localStorage.removeItem("login-token");
     dispatch({ type: "logout" });
   }
 

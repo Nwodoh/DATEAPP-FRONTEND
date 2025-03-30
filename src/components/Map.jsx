@@ -45,7 +45,7 @@ function Explorer() {
     },
     [geolocationPosition, setMapPosition]
   );
-
+  console.log(allUsers);
   return (
     <div className={`self-stretch w-[50vw]`}>
       <MapContainer
@@ -65,10 +65,11 @@ function Explorer() {
             key={user.id}
             icon={L.divIcon({
               className: "custom-marker",
-              html: `<div class="marker-wrapper">
-                     <img src="${IMG_API}/${user.image_urls[0]}" class="marker-img" />
-                   </div>`,
+              html: `<div class="marker-wrapper marker-img-wrapper">
+                      <div class="marker-img" style="background-image: url('${BASE_API}/image/${user.profile_image}'); background-size: cover;"></div>
+                    </div>`,
             })}
+            // <img src="${IMG_API}/${user.profile_image}" class="marker-img" />
             eventHandlers={{
               click: () => navigate(`./profile/${user.id}`),
             }}

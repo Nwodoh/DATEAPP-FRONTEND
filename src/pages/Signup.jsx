@@ -22,18 +22,23 @@ function Signup({ type = "signup" }) {
 }
 
 function SignupForm() {
-  const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [email, setEmail] = useState("mickdaniels101@gmail.com");
   const { sendOtp } = useAuth();
   const navigate = useNavigate();
 
   async function handleSubmit(e) {
     try {
       e.preventDefault();
+      if (isSubmitting) return;
       if (!email) return;
+      setIsSubmitting(true);
       await sendOtp(email);
       navigate("./verify");
     } catch (err) {
       alert(err.message);
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -56,7 +61,11 @@ function SignupForm() {
               required
             />
           </label>
-          <GlassCTA type="button" className="before:bg-stone-900/80 w-min">
+          <GlassCTA
+            type="button"
+            className="before:bg-stone-900/80 w-min"
+            isLoading={isSubmitting}
+          >
             Get signup OTP
           </GlassCTA>
         </GlassForm>
@@ -68,6 +77,7 @@ function SignupForm() {
 function VerificationForm() {
   // PRE-FILL FOR DEV PURPOSES
   const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [otp, setOtp] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
@@ -77,10 +87,14 @@ function VerificationForm() {
   async function handleSubmit(e) {
     try {
       e.preventDefault();
+      if (isSubmitting) return;
+      setIsSubmitting(true);
       await signup({ email, password, passwordConfirm, otp });
       navigate("/app/profile");
     } catch (err) {
-      alert(err);
+      alert(err.message || "Error with signing up");
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -108,7 +122,7 @@ function VerificationForm() {
             <input
               type="password"
               className="grow text-base outline-none font-medium tracking-wider"
-              minLength={5}
+              minLength={6}
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -120,7 +134,7 @@ function VerificationForm() {
             <input
               type="password"
               className="grow text-base outline-none font-medium tracking-wider"
-              minLength={5}
+              minLength={6}
               placeholder="Confirm password"
               value={passwordConfirm}
               onChange={(e) => setPasswordConfirm(e.target.value)}
@@ -133,6 +147,7 @@ function VerificationForm() {
           <GlassCTA
             type="button"
             className="before:bg-stone-900/80 w-min mt-1.5"
+            isLoading={isSubmitting}
           >
             Sign Up
           </GlassCTA>

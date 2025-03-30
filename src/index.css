@@ -151,9 +151,23 @@ body {
 .marker-img {
   width: 40px;
   height: 40px;
+  display: flex;
+  flex-shrink: 0;
   border-radius: 99999px;
-  min-width: 40px;
-  min-height: 40px;
+  min-width: 45px;
+  min-height: 45px;
+  z-index: 10;
+}
+
+.marker-img-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: fit-content;
+  border-radius: 9999px;
+  border: solid 4px #193cb830;
+  background-image: url("/bg/paper.png");
+  background-size: cover;
 }
 
 :global(.leaflet-popup .leaflet-popup-content-wrapper) {
