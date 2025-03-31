@@ -12,7 +12,6 @@ function ProfilePage() {
   const navigate = useNavigate();
   const { user, getUser, BASE_API, updateUser, like, logout } = useAuth();
   const { clearChatState } = useChats();
-  console.log("USERRRR", user);
   const otherUserId = useParams()?.otherUserId || user?.id;
   const [otherUser, setOtherUser] = useState(undefined);
   const isMe = user?.id === otherUser?.id;
@@ -58,7 +57,6 @@ function ProfilePage() {
       setOrientation(otherUser.orientation);
       setBackgroundImgUrl(`${BASE_API}/image/${otherUser.background_image}`);
       setProfileImgUrl(`${BASE_API}/image/${otherUser.profile_image}`);
-      console.log(`${BASE_API}/image/${otherUser.profile_image}`);
       setDateOfBirth(() => {
         try {
           return new Date(otherUser.date_of_birth)
@@ -75,9 +73,8 @@ function ProfilePage() {
   useEffect(
     function () {
       async function setUser() {
-        console.log("here");
         const otherUser = await getUser(otherUserId);
-        console.log("otherUser: ", otherUser);
+
         if (!otherUser) return;
         initUserState(otherUser);
       }

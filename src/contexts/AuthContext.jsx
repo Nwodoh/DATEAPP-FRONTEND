@@ -74,7 +74,6 @@ function AuthProvider({ children }) {
   const setUserLocation = useCallback(
     async function setUserLocation() {
       const location = await getPosition();
-      console.log("setUserLocation");
 
       if (!location?.length) return;
 
@@ -119,11 +118,9 @@ function AuthProvider({ children }) {
   const getUser = useCallback(
     async function getUser(userId = "") {
       dispatch({ type: "loading" });
-      console.log("GET USER");
 
       try {
         userId || setUserLocation();
-        console.log("URL: ", `${USER_API}/user/${userId}`);
         const res = await fetch(`${USER_API}/user/${userId}`, {
           credentials: "include",
           headers: {

@@ -14,7 +14,8 @@ const ChatsContext = createContext();
 const initialState = {
   chats: [],
   isLoading: false,
-  activeChat: 0,
+  isLoadingMessages: false,
+  activeOtherUser: {},
   currentChat: [],
   error: "",
 };
@@ -23,6 +24,9 @@ function reducer(state, action) {
   switch (action.type) {
     case "loading":
       return { ...state, isLoading: true };
+
+    case "chats/loadingMessages":
+      return { ...state, isLoadingMessages: true };
 
     case "chats/loaded":
       socket.emit("chat/active", action.payload || []);
@@ -35,19 +39,42 @@ function reducer(state, action) {
     case "chat/loaded":
       return {
         ...state,
-        isLoading: false,
+        isLoadingMessages: false,
         currentChat: action.payload.currentChat || [],
-        activeChat: +action.payload.activeChat || 0,
+        activeOtherUser: action.payload.activeOtherUser || 0,
       };
 
     case "chat/new":
+      state.currentChat.forEach((chat, i) => {
+        if (chat.optimistic && chat.sender_id === action.payload.sender_id)
+          state.currentChat.splice(i, 1); // remove optimistics
+      });
+
       return {
         ...state,
         chats: state.chats.map((chat) => {
-          if (chat.other_user.id !== action.payload.other_user.id) return chat;
+          if (chat.other_user.id !== action.payload.receiver_id) return chat;
           else return action.payload;
         }),
         currentChat: [...state.currentChat, action.payload],
+      };
+
+    case "chat/new/optimistic":
+      const { sender_id, receiver_id, message } = action.payload;
+
+      return {
+        ...state,
+        currentChat: [
+          ...state.currentChat,
+          {
+            id: Date.now(),
+            optimistic: true,
+            sender_id,
+            receiver_id,
+            message,
+            otherUser: state.activeOtherUser,
+          },
+        ],
       };
 
     case "chat/newPerson":
@@ -70,8 +97,17 @@ function reducer(state, action) {
 function ChatsProvider({ children }) {
   const { BASE_API, isAuthenticated, user } = useAuth();
   const CHAT_API = `${BASE_API}/chat`;
-  const [{ chats, isLoading, currentChat, activeChat, error }, dispatch] =
-    useReducer(reducer, initialState);
+  const [
+    {
+      chats,
+      isLoading,
+      isLoadingMessages,
+      currentChat,
+      activeOtherUser,
+      error,
+    },
+    dispatch,
+  ] = useReducer(reducer, initialState);
   const [showExplorer, setShowExplorer] = useState(false);
 
   useEffect(
@@ -87,7 +123,7 @@ function ChatsProvider({ children }) {
             },
           });
           const data = await res.json();
-          console.log(data);
+
           dispatch({ type: "chats/loaded", payload: data.chats });
         } catch (err) {
           console.log(err);
@@ -104,7 +140,7 @@ function ChatsProvider({ children }) {
 
   const getChat = useCallback(
     async function getChat(otherUserId) {
-      dispatch({ type: "loading" });
+      dispatch({ type: "chats/loadingMessages" });
 
       try {
         const res = await fetch(`${CHAT_API}/${otherUserId}`, {
@@ -119,7 +155,10 @@ function ChatsProvider({ children }) {
 
         dispatch({
           type: "chat/loaded",
-          payload: { currentChat: data.chats, activeChat: otherUserId },
+          payload: {
+            currentChat: data.chats,
+            activeOtherUser: data.other_user,
+          },
         });
       } catch (err) {
         dispatch({
@@ -133,6 +172,10 @@ function ChatsProvider({ children }) {
 
   async function sendChat(receiverId, message) {
     try {
+      dispatch({
+        type: "chat/new/optimistic",
+        payload: { sender_id: user?.id, receiver_id: receiverId, message },
+      });
       const res = await fetch(`${CHAT_API}/`, {
         method: "POST",
         credentials: "include",
@@ -148,18 +191,19 @@ function ChatsProvider({ children }) {
       if (data.status !== "success")
         throw new Error(data?.message || data?.error);
 
+      dispatch({
+        type: "chat/new",
+        payload: data.newChat,
+      });
+
       if (
-        !chats.find((chat) => chat.other_user.id === data.newChat.other_user.id)
+        !chats.find((chat) => chat.other_user.id === data.newChat.receiver_id)
       )
         dispatch({
           type: "chat/newPerson",
           payload: data.newChat,
         });
 
-      dispatch({
-        type: "chat/new",
-        payload: data.newChat,
-      });
       socket.emit("chat/sent", data.newChat);
     } catch (err) {
       console.log(err);
@@ -195,10 +239,11 @@ function ChatsProvider({ children }) {
       value={{
         chats,
         isLoading,
+        isLoadingMessages,
         currentChat,
         error,
         getChat,
-        activeChat,
+        activeOtherUser,
         sendChat,
         clearChatState,
         showExplorer,

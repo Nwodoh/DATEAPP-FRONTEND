@@ -44,7 +44,6 @@ function Explorer() {
     },
     [geolocationPosition, setMapPosition]
   );
-  console.log(allUsers);
   return (
     <div className={`self-stretch w-[50vw]`}>
       <MapContainer

@@ -7,32 +7,24 @@ import { PaperAirplaneIcon } from "@heroicons/react/16/solid";
 
 function ChatPage() {
   const [message, setMessage] = useState("");
-  const [otherUser, setOtherUser] = useState({});
   const { otherUserId } = useParams();
-  const { getUser, BASE_API } = useAuth();
+  const { BASE_API, user } = useAuth();
   const IMG_API = `${BASE_API}/image`;
-  const { currentChat, chats, getChat, isLoading, sendChat } = useChats();
+  const {
+    currentChat,
+    activeOtherUser: otherUser,
+    getChat,
+    isLoadingMessages,
+    sendChat,
+  } = useChats();
+  const userId = user?.id;
 
   useEffect(
     function () {
-      async function storeOtherUser(otherUserId) {
-        const otherUser =
-          chats.find((chat) => chat.other_user.id === Number(otherUserId))
-            ?.other_user || (await getUser(otherUserId));
-        setOtherUser(otherUser);
-      }
-
-      storeOtherUser(otherUserId);
+      if (!otherUserId) return;
+      getChat(otherUserId);
     },
-    [otherUserId, chats, getUser]
-  );
-
-  useEffect(
-    function () {
-      if (!otherUser?.id) return;
-      getChat(otherUser?.id);
-    },
-    [getChat, otherUser]
+    [getChat, otherUserId]
   );
 
   function handleSendChat(e) {
@@ -41,7 +33,7 @@ function ChatPage() {
     setMessage("");
   }
 
-  if (isLoading || !otherUser?.id) return <Spinner />;
+  if (isLoadingMessages || !otherUser?.id || !userId) return <Spinner />;
 
   return (
     <div className="flex flex-col h-[100%] overflow-hidden relative">
@@ -59,7 +51,7 @@ function ChatPage() {
       </header>
       <section className="grow flex flex-col overflow-y-auto pt-14 px-2">
         {currentChat.map((chat) => (
-          <Message chat={chat} key={chat.id} />
+          <Message chat={chat} userId={userId} key={chat.id} />
         ))}
       </section>
       <form
@@ -88,8 +80,9 @@ function ChatPage() {
   );
 }
 
-function Message({ chat }) {
-  const { message, is_sender: isSender = false } = chat;
+function Message({ chat, userId = "" }) {
+  const { message, sender_id } = chat;
+  const isSender = userId === sender_id;
 
   return (
     <div

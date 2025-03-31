@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { useChats } from "../contexts/ChatsContext";
 import { useAuth } from "../contexts/AuthContext";
 
 const formatDate = (date) =>
@@ -12,16 +11,12 @@ const formatDate = (date) =>
 function ChatListItem({ chat }) {
   const { BASE_API } = useAuth();
   const IMG_API = `${BASE_API}/image`;
-  const { activeChat } = useChats();
   const { message, created_at, other_user: otherUser } = chat;
-  const isActiveChat = otherUser.id === activeChat;
 
   return (
     <li className="border-b-[0.1px] border-b-white/27 last:border-b-transparent">
       <Link
-        className={`flex items-center gap-2 text-base py-4 ${
-          isActiveChat ? "border-none border-l-[2px] border-l-white" : ""
-        }`}
+        className="flex items-center gap-2 text-base py-4"
         to={`./${otherUser.id}`}
       >
         <div
