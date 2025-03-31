@@ -25,7 +25,6 @@ function Explorer() {
     mapPosition,
     setMapPosition,
   } = useAuth();
-  const IMG_API = `${BASE_API}/image`;
 
   const { position: geolocationPosition } = useGeolocation();
   const [mapLat, mapLng] = useUrlPosition(mapPosition);

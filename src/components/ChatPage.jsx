@@ -49,7 +49,7 @@ function ChatPage() {
         <div
           className="h-11 w-11 shrink-0 rounded-full bg-cover bg-white/37 bg-center"
           style={{
-            backgroundImage: `url('${IMG_API}/${otherUser.image_urls[0]}')`,
+            backgroundImage: `url('${IMG_API}/${otherUser.profile_image}')`,
           }}
         ></div>
         <div>

@@ -20,7 +20,7 @@ function LikesProfile({ user }) {
       <div
         className={`w-16 h-16 border-[2px] mb-3.5 shrink-0 rounded-full bg-cover bg-white/37 bg-center`}
         style={{
-          backgroundImage: `url('${IMG_API}/${user.image_urls[0]}')`,
+          backgroundImage: `url('${IMG_API}/${user.profile_image}')`,
         }}
       ></div>
       <div className="text-sm max-w-[95%] overflow-hidden whitespace-nowrap text-ellipsis">
