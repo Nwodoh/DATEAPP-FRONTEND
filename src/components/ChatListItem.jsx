@@ -7,13 +7,13 @@ const formatDate = (date) =>
     day: "numeric",
     month: "long",
     year: "numeric",
-  }).format(new Date(date));
+  }).format(new Date(date || Date.now()));
 
 function ChatListItem({ chat }) {
   const { BASE_API } = useAuth();
   const IMG_API = `${BASE_API}/image`;
   const { activeChat } = useChats();
-  const { message, timestamp, other_user: otherUser } = chat;
+  const { message, created_at, other_user: otherUser } = chat;
   const isActiveChat = otherUser.id === activeChat;
 
   return (
@@ -27,7 +27,7 @@ function ChatListItem({ chat }) {
         <div
           className="h-11 w-11 shrink-0 rounded-full bg-cover bg-white/37 bg-center"
           style={{
-            backgroundImage: `url('${IMG_API}/${otherUser.image_urls[0]}')`,
+            backgroundImage: `url('${IMG_API}/${otherUser.profile_image}')`,
           }}
         ></div>
         <div className="flex flex-col grow">
@@ -36,7 +36,7 @@ function ChatListItem({ chat }) {
               <span>{otherUser.name}</span>
               <span className="text-sm"> @{otherUser.username}</span>
             </h3>
-            <time className="text-sm">{formatDate(timestamp)}</time>
+            <time className="text-sm">{formatDate(created_at)}</time>
           </div>
           <p className="overflow-hidden whitespace-nowrap text-ellipsis max-w-[90%] text-sm">
             {message}

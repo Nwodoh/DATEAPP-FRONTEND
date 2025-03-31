@@ -51,7 +51,7 @@ function ProfilePage() {
     function (otherUser) {
       setOtherUser(otherUser);
       setName(otherUser.name);
-      setOtherUserLikes(otherUser.likes);
+      setOtherUserLikes(otherUser.likes || []);
       setUsername(otherUser.username);
       setAbout(otherUser.about);
       setGender(otherUser.gender);

@@ -80,12 +80,17 @@ function ChatsProvider({ children }) {
         dispatch({ type: "loading" });
 
         try {
-          const res = await fetch(CHAT_API, {
+          const res = await fetch(`${CHAT_API}/`, {
             credentials: "include",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("login-token")}`,
+            },
           });
           const data = await res.json();
+          console.log(data);
           dispatch({ type: "chats/loaded", payload: data.chats });
         } catch (err) {
+          console.log(err);
           dispatch({
             type: "rejected",
             payload: "There was an error loading your chats...",
@@ -104,6 +109,9 @@ function ChatsProvider({ children }) {
       try {
         const res = await fetch(`${CHAT_API}/${otherUserId}`, {
           credentials: "include",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("login-token")}`,
+          },
         });
         const data = await res.json();
 
@@ -130,12 +138,15 @@ function ChatsProvider({ children }) {
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("login-token")}`,
         },
         body: JSON.stringify({ receiverId, message }),
       });
 
       const data = await res.json();
-      if (data.status !== "success") throw new Error(data?.message);
+
+      if (data.status !== "success")
+        throw new Error(data?.message || data?.error);
 
       if (
         !chats.find((chat) => chat.other_user.id === data.newChat.other_user.id)
