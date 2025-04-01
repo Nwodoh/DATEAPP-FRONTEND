@@ -66,7 +66,7 @@ function AuthProvider({ children }) {
 
   useEffect(
     function () {
-      user && setMapPosition(user?.location);
+      user && setMapPosition(user?.location || [0, 0]);
     },
     [user]
   );
@@ -87,33 +87,30 @@ function AuthProvider({ children }) {
         body: JSON.stringify({ location }),
       });
     },
-    [USER_API]
+    [getPosition]
   );
 
-  const updateUser = useCallback(
-    async function updateUser(userData) {
-      try {
-        const res = await fetch(`${USER_API}/`, {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("login-token")}`,
-          },
-          body: JSON.stringify({ ...userData }),
-        });
-        const data = await res.json();
+  const updateUser = useCallback(async function updateUser(userData) {
+    try {
+      const res = await fetch(`${USER_API}/`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("login-token")}`,
+        },
+        body: JSON.stringify({ ...userData }),
+      });
+      const data = await res.json();
 
-        if (data.status !== "success") throw new Error();
-        if (!data.user) throw new Error();
+      if (data.status !== "success") throw new Error();
+      if (!data.user) throw new Error();
 
-        dispatch({ type: "login", payload: data.user });
-      } catch (err) {
-        throw new Error(`${err.message}. \n Unable to upload updates.`);
-      }
-    },
-    [USER_API]
-  );
+      dispatch({ type: "login", payload: data.user });
+    } catch (err) {
+      throw new Error(`${err.message}. \n Unable to upload updates.`);
+    }
+  }, []);
 
   const getUser = useCallback(
     async function getUser(userId = "") {
@@ -141,7 +138,7 @@ function AuthProvider({ children }) {
 
   useEffect(() => {
     getUser();
-  }, []);
+  }, [getUser]);
 
   async function login(email, password) {
     dispatch({ type: "loading" });
@@ -160,11 +157,10 @@ function AuthProvider({ children }) {
       if (data.status !== "success") throw new Error(data.message);
       if (!data.user) throw new Error("User not Found.");
 
-      dispatch({ type: "login", payload: data.user });
       localStorage.setItem("login-token", data.idToken);
+      dispatch({ type: "login", payload: data.user });
     } catch (err) {
       dispatch({ type: "loaded" });
-      dispatch({ type: "loading" });
 
       alert(err.message || "There was an error with your request");
     }

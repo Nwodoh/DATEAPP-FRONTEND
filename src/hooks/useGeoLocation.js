@@ -1,5 +1,7 @@
+import { useCallback } from "react";
+
 export function useGeolocation(defaultPosition = null) {
-  async function getPosition() {
+  const getPosition = useCallback(async function () {
     try {
       if (!navigator.geolocation)
         throw new Error("Your browser does not support geolocation");
@@ -12,7 +14,7 @@ export function useGeolocation(defaultPosition = null) {
     } catch (err) {
       console.error(err);
     }
-  }
+  }, []);
 
   return { getPosition };
 }

@@ -49,7 +49,7 @@ function Explorer() {
       <MapContainer
         center={mapPosition}
         zoomControl={false}
-        zoom={17}
+        zoom={13}
         scrollWheelZoom={true}
         className="h-full relative"
       >

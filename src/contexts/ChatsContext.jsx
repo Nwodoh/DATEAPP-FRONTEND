@@ -133,7 +133,7 @@ function ChatsProvider({ children }) {
           });
         }
       }
-      getChats();
+      isAuthenticated && getChats();
     },
     [CHAT_API, isAuthenticated]
   );
@@ -220,7 +220,7 @@ function ChatsProvider({ children }) {
 
   useEffect(() => {
     function handleChatReceived(newChat) {
-      if (newChat?.sender?.id === user?.id) return;
+      if (newChat?.sender_id === user?.id) return;
       dispatch({
         type: "chat/new",
         payload: newChat,
