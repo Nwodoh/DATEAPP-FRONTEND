@@ -7,14 +7,14 @@ function AppNav({ className }) {
   const navigate = useNavigate();
 
   function handleClick(label = "") {
-    if (label === "map") setShowExplorer(true);
+    if (label === "explore") setShowExplorer(true);
     else navigate(`./${label.toLowerCase()}`);
   }
 
   return (
     <nav className={className}>
       <PageControls
-        labels={["Chats", "likes", "map"]}
+        labels={["Chats", "likes", "explore"]}
         color="white"
         handleClick={handleClick}
       />

@@ -8,12 +8,13 @@ import {
 } from "react-leaflet";
 import L from "leaflet";
 
-import { useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useGeolocation } from "../hooks/useGeolocation";
 import { useUrlPosition } from "../hooks/useUrlPosition";
 import { useAuth } from "../contexts/AuthContext";
 import { XMarkIcon } from "@heroicons/react/16/solid";
 import { useChats } from "../contexts/ChatsContext";
+import { MagnifyingGlass } from "@phosphor-icons/react";
 
 function Explorer() {
   const navigate = useNavigate();
@@ -45,7 +46,8 @@ function Explorer() {
     [geolocationPosition, setMapPosition]
   );
   return (
-    <div className={`self-stretch w-[50vw]`}>
+    <div className={`relative self-stretch w-[50vw]`}>
+      <Search setMapPosition={setMapPosition} />
       <MapContainer
         center={mapPosition}
         zoomControl={false}
@@ -103,6 +105,82 @@ function DetectClick() {
   useMapEvents({
     click: (e) => navigate(`chats?lat=${e.latlng.lat}&lng=${e.latlng.lng}`),
   });
+}
+
+function Search({ setMapPosition }) {
+  const navigate = useNavigate();
+  const { BASE_API, USER_API } = useAuth();
+  const IMG_API = `${BASE_API}/image`;
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const [results, setResults] = useState([]);
+
+  const handleSearch = useCallback(
+    async function (value = "") {
+      if (!value.length) return;
+
+      const res = await fetch(`${USER_API}/search/${value}`, {
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("login-token")}`,
+        },
+      });
+
+      const data = await res.json();
+
+      if (data.status !== "success") throw new Error();
+      setResults(data.results);
+    },
+    [USER_API]
+  );
+
+  useEffect(
+    function () {
+      if (searchQuery.length > 0) handleSearch(searchQuery);
+    },
+    [searchQuery, handleSearch]
+  );
+
+  return (
+    <div className="z-[99999] absolute top-5 left-3 flex flex-col gap-2">
+      <div className="backdrop-blur-md bg-blue-800/80 rounded-[10px] overflow-hidden">
+        <label className=" bg-[url('/bg/paper.png')] flex items-center gap-[7px] p-[7px]">
+          <MagnifyingGlass className="fill-white w-5 h-5" />
+          <input
+            type="text"
+            placeholder="Search"
+            className="text-white outline-0"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </label>
+      </div>
+      {results.length && (
+        <div className="backdrop-blur-md bg-blue-800/80 rounded-[10px] overflow-hidden">
+          {results.map((result) => (
+            <button
+              className="w-full flex gap-2 items-center py-2 mx-2 border-0 border-b-[0.1px] border-b-white/10 last:border-b-0"
+              onClick={(e) => {
+                navigate(`./profile/${result.id}`);
+                setMapPosition(result.location);
+              }}
+            >
+              <div
+                className="h-8 w-8 shrink-0 rounded-full bg-cover bg-white/37 bg-center"
+                style={{
+                  backgroundImage: `url('${IMG_API}/${result.profile_image}')`,
+                }}
+              ></div>
+              <div className="">
+                <span>{result.name}</span>
+                <span className="font-semibold"> @{result.username}</span>
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default Explorer;

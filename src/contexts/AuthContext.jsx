@@ -293,6 +293,7 @@ function AuthProvider({ children }) {
         resetPassword,
         signup,
         BASE_API,
+        USER_API,
         getUsersAroundPoint,
         allUsers,
         getUser,
