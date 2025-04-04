@@ -9,6 +9,14 @@ import {
 import { useAuth } from "./AuthContext";
 import { socket } from "../socket";
 
+/**
+ * ChatsProvider manages the chat state and real-time messaging using React Context and Reducer.
+ * - Handles fetching, sending, and receiving chat messages.
+ * - Manages loading states and errors.
+ * - Uses Socket.io for real-time chat updates.
+ * - Provides an API for accessing and modifying chat data throughout the app.
+ */
+
 const ChatsContext = createContext();
 
 const initialState = {

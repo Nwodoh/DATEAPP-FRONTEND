@@ -16,6 +16,9 @@ import { XMarkIcon } from "@heroicons/react/16/solid";
 import { useChats } from "../contexts/ChatsContext";
 import { MagnifyingGlass } from "@phosphor-icons/react";
 
+// Handles all functionalities that can be seen on the Explore component
+
+
 function Explorer() {
   const navigate = useNavigate();
   const { setShowExplorer } = useChats();
@@ -47,7 +50,9 @@ function Explorer() {
   );
   return (
     <div className={`relative self-stretch w-[50vw]`}>
+      {/* Search Component */}
       <Search setMapPosition={setMapPosition} />
+      {/* Map Component From leaflet-react a third party library for maps */}
       <MapContainer
         center={mapPosition}
         zoomControl={false}
@@ -55,10 +60,12 @@ function Explorer() {
         scrollWheelZoom={true}
         className="h-full relative"
       >
+        {/* TileLayer shows the actual map image that makes up the countries that can be seen */}
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
         />
+        {/* For Each in the DB, we create a profile image on the map displayed on their location. This image can then be to open their profile */}
         {allUsers.map((user) => (
           <Marker
             position={[user.location[0], user.location[1]]}
@@ -69,13 +76,13 @@ function Explorer() {
                       <div class="marker-img" style="background-image: url('${BASE_API}/image/${user.profile_image}'); background-size: cover;"></div>
                     </div>`,
             })}
-            // <img src="${IMG_API}/${user.profile_image}" class="marker-img" />
             eventHandlers={{
               click: () => navigate(`./profile/${user.id}`),
             }}
           />
         ))}
         <ChangeCenter position={mapPosition} />
+        {/* Detects a map click and scrolls to wherever was clicked */}
         <DetectClick />
         <button
           type="button"

@@ -8,6 +8,7 @@ import {
   MagnifyingGlassIcon,
 } from "@heroicons/react/16/solid";
 
+// About page
 export default function About() {
   return (
     <HomeWrapper bgImage="/bg/pexels-pnw-prod-8575595.jpg">

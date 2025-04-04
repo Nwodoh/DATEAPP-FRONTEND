@@ -10,6 +10,11 @@ import {
 } from "@heroicons/react/16/solid";
 import GlassCTA from "../components/GlassCTA";
 
+// Login component handles navigation based on authentication status
+// and renders different forms based on the 'type' prop (login, forgot-password, reset-password).
+// LoginForm component handles user login by submitting email and password.
+// ForgotPassword component allows users to request an OTP for password reset.
+// ResetPassword component allows users to reset their password using an OTP.
 export default function Login({ type = "login" }) {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();

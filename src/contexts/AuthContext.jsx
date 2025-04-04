@@ -9,6 +9,12 @@ import {
 import { socket } from "../socket";
 import { useGeolocation } from "../hooks/useGeolocation";
 
+/**
+ * AuthProvider manages the user state, login/signup, authentication e.t.c.
+ * - Handles fetching user data, and authentication logics
+ * - Provides an API for accessing and modifying global user data throughout the app.
+ */
+
 const AuthContext = createContext();
 const BASE_API = "http://127.0.0.1:5000/api/v1";
 const AUTH_API = `${BASE_API}/auth`;

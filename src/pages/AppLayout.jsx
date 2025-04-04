@@ -2,6 +2,8 @@ import Explorer from "../components/Map";
 import Sidebar from "../components/Sidebar";
 import { useChats } from "../contexts/ChatsContext";
 
+// This is the layout fo the main app.
+// The side bar is where chats, profile and likes are displayed and the explorer contains the map and search component. The Explorer can be closed or opened
 function AppLayout() {
   const { showExplorer } = useChats();
 

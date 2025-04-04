@@ -1,6 +1,7 @@
 import { useAuth } from "../contexts/AuthContext";
 import LikesProfile from "./LikesProfile";
 
+// Show an element for each like a user has gotten
 function Likes() {
   const { user } = useAuth();
   const numberOfLikes = user?.likes?.length;

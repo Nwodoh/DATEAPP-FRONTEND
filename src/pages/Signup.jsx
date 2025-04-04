@@ -10,6 +10,11 @@ import {
   ShieldCheckIcon,
 } from "@heroicons/react/16/solid";
 
+// This component handles user registration and email verification.
+// - `SignupForm`: Collects the user's email and sends a verification OTP.
+// - `VerificationForm`: Verifies the OTP and sets the user's password.
+// - Uses `useAuth` for authentication and `useNavigate` for routing.
+
 function Signup({ type = "signup" }) {
   return (
     <HomeWrapper bgImage="/bg/pexels-fmaderebner-340566-1.jpg">

@@ -19,6 +19,15 @@ import Login from "./pages/Login";
 import AppLayout from "./pages/AppLayout";
 import PageNotFound from "./pages/PageNotFound";
 
+/**
+ * The main entry point of the React app.
+ * - Manages all client-side routing using `BrowserRouter`.
+ * - Provides authentication and chat context via `AuthProvider` and `ChatsProvider`. The context is where global states are managed.
+ * - Renders global navigation (`PageNav`). The same naviation that can be seen on the home and signup pages.
+ * - Uses `Suspense` to handle lazy loading with a fallback spinner.
+ * - Defines protected and public routes for authentication, chat, profiles, and error handling.
+ */
+
 function App() {
   return (
     <BrowserRouter>

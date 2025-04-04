@@ -1,5 +1,8 @@
 import { useCallback } from "react";
 
+// useGeolocation hook provides a function to retrieve the user's current geolocation coordinates (latitude, longitude).
+// It handles errors if geolocation is not supported or fails.
+
 export function useGeolocation(defaultPosition = null) {
   const getPosition = useCallback(async function () {
     try {

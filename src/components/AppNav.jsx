@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useChats } from "../contexts/ChatsContext";
 import PageControls from "./PageControls";
 
+// NAvigation for the application. It uses the PageControls component to display buttons for the chat, like and explore pages.
 function AppNav({ className }) {
   const { setShowExplorer } = useChats();
   const navigate = useNavigate();

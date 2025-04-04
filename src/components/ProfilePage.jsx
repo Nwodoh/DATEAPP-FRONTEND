@@ -8,6 +8,8 @@ import {
 import { BookmarkIcon, HeartIcon } from "@heroicons/react/24/outline";
 import { useChats } from "../contexts/ChatsContext";
 
+// As the name says, it handles a functionalityies in the profile page like updating a profile, liking a profile and logging out
+
 function ProfilePage() {
   const navigate = useNavigate();
   const { user, getUser, BASE_API, updateUser, like, logout } = useAuth();

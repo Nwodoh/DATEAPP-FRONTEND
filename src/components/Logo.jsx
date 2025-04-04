@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 
+// Logo Displayed on the page navigation
 function Logo() {
   return (
     <Link

@@ -11,6 +11,8 @@ function getRGB(color) {
   }
 }
 
+// Component that is used by the AppNav component to show the navigation (chat, like, explore)
+
 export default function PageControls({
   labels = [],
   color = "#123524",

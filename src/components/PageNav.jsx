@@ -3,6 +3,18 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import Logo from "./Logo";
 
+// PageNav.jsx - Navigation bar component with animated highlight effect
+
+// This component renders the main navigation bar of the application.
+// It includes links to the homepage, about page, sign-up, and login pages.
+// The navigation bar features a dynamic highlight effect that moves based on
+// the active route, enhancing user experience. This highlight effect is the white element that moves between the button when clicked
+
+// Key Features:
+// - Uses `useLocation` to determine the current route and highlight the active link.
+// - Implements a motion-based highlight effect using `framer-motion`.
+// - Excludes the navigation bar on routes that start with "/app".
+
 function PageNav() {
   const NAV_CONTAINER_PADDING = 20;
   const location = useLocation();

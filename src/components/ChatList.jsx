@@ -3,6 +3,7 @@ import ChatListItem from "./ChatListItem";
 import Message from "./Message";
 import { useChats } from "../contexts/ChatsContext";
 
+// Shows a list of people a user has chatted with and if none, it displays a message.
 function ChatList() {
   const { chats, isLoading } = useChats();
 

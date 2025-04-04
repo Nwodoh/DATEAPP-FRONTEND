@@ -5,6 +5,8 @@ import Spinner from "./Spinner";
 import { useAuth } from "../contexts/AuthContext";
 import { PaperAirplaneIcon } from "@heroicons/react/16/solid";
 
+// This is the page that show the messages between and where you can see and send chats
+
 function ChatPage() {
   const [message, setMessage] = useState("");
   const { otherUserId } = useParams();

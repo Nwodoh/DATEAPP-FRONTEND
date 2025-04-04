@@ -2,6 +2,8 @@ import { Link, Outlet } from "react-router-dom";
 import AppNav from "./AppNav";
 import Profile from "./Profile";
 
+// Manages the app navigation (chats, likes, map) and assigns which one should be rendered in the <Outlet/>
+
 function Sidebar() {
   return (
     <div className="p-5 pb-2">

@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
+// User Profile Image that can be seen on the top-right part of the sidebar when signed in.
+
 function Profile() {
   const { user, isLoading, BASE_API } = useAuth();
 

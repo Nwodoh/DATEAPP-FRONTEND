@@ -8,6 +8,8 @@ const formatDate = (date) =>
     year: "numeric",
   }).format(new Date(date || Date.now()));
 
+// AN item on the chatList
+
 function ChatListItem({ chat }) {
   const { BASE_API } = useAuth();
   const IMG_API = `${BASE_API}/image`;
